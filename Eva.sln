@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EAS", "EAS\EAS.csproj", "{5C370671-AE2C-4B86-BEC7-BE3E1268404C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Node", "Node", "{4286746C-AAFE-4AF8-9A74-C65207C90C7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Node.NET", "Node.NET\Node.NET.csproj", "{1944BBBD-8B4C-41C3-9CA4-EE8BC64638CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commons", "Commons\Commons.csproj", "{84692DB2-8E81-4E06-B8FB-B8BF9633B2F0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5C370671-AE2C-4B86-BEC7-BE3E1268404C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C370671-AE2C-4B86-BEC7-BE3E1268404C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C370671-AE2C-4B86-BEC7-BE3E1268404C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C370671-AE2C-4B86-BEC7-BE3E1268404C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1944BBBD-8B4C-41C3-9CA4-EE8BC64638CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1944BBBD-8B4C-41C3-9CA4-EE8BC64638CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1944BBBD-8B4C-41C3-9CA4-EE8BC64638CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1944BBBD-8B4C-41C3-9CA4-EE8BC64638CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84692DB2-8E81-4E06-B8FB-B8BF9633B2F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84692DB2-8E81-4E06-B8FB-B8BF9633B2F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84692DB2-8E81-4E06-B8FB-B8BF9633B2F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84692DB2-8E81-4E06-B8FB-B8BF9633B2F0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1944BBBD-8B4C-41C3-9CA4-EE8BC64638CA} = {4286746C-AAFE-4AF8-9A74-C65207C90C7A}
+	EndGlobalSection
+EndGlobal
