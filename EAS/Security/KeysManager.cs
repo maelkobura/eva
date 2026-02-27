@@ -17,8 +17,8 @@ public class KeysManager
     {
         if (IsInitialized) return;
         logger.LogInformation("Initializing KeysManager...");
+        GenerateKeys(showPrivateKey);
         logger.LogInformation("Public key: {}", 
-            
             BitConverter.ToString(PublicKey.Export(KeyBlobFormat.RawPublicKey)).Replace("-", ""));
         logger.LogInformation("Private key: {}", 
             showPrivateKey ? BitConverter.ToString(PrivateKey.Export(KeyBlobFormat.RawPrivateKey)).Replace("-", "") : "hidden");
