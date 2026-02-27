@@ -1,0 +1,50 @@
+﻿using Eva.Commons.Util;
+using Microsoft.Extensions.Logging;
+
+namespace Eva.AuthorityServer.User;
+
+public class UserAuthenticator
+{
+    private static ILogger logger = EvaLogger.CreateLogger<UserAuthenticator>();
+
+    public static bool IsInitialized { get; private set; } = false;
+    private static UserDatabaseContext context;
+    
+    public static void Init()
+    {
+        if (IsInitialized) return;
+        logger.LogInformation("Initializing UserAuthenticator...");
+        
+        string dbConnection = "Host=localhost;Database=evauser;Username=eas;Password=eas123"; //TODO: Change for config
+        
+        context = new UserDatabaseContext(dbConnection);
+        context.Database.EnsureCreated();
+        if(context.Users.Count()==0)
+        {
+            logger.LogInformation("No users found, creating default user...");
+            
+            var defUser = new UserEntity
+            {
+                Username = "eva.user",
+                Code = "000000", //TODO PBKDF2
+                Authorizations = new List<string>() {"*"}
+            };
+            context.Users.Add(defUser);
+            context.SaveChanges();
+            logger.LogInformation("Default user created.");
+        }
+        IsInitialized = true;
+    }
+    
+    public static UserEntity Login(string username, string code)
+    {
+        if (!IsInitialized) throw new Exception("UserAuthenticator is not initialized.");
+        context.Database.EnsureCreated();
+        
+        //TODO PBKDF2
+        var user = context.Users.FirstOrDefault(u => u.Username == username);
+        if (user == null) throw new Exception("User not found.");
+        if (user.Code != code) throw new Exception("Invalid code.");
+        return user;
+    }
+}
