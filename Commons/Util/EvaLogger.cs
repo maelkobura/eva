@@ -9,7 +9,7 @@ public class EvaLogger
 
     public static void Init()
     {
-        var loggerFactory = LoggerFactory.Create(builder =>
+        Factory = LoggerFactory.Create(builder =>
         {
             builder.AddConsole();
         });
