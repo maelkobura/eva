@@ -18,7 +18,7 @@ public class EvaLogger
                 options.FormatterName = "EvaFormatStyle";
             }).AddConsoleFormatter<EvaFormatConsoleFormatter, ConsoleFormatterOptions>(opts => {});
         });
-
+        
         EvaFormatConsoleFormatter.AppName = appName;
     }
 
@@ -41,9 +41,28 @@ public class EvaFormatConsoleFormatter : ConsoleFormatter
     {
         string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
         string level = logEntry.LogLevel.ToString().PadRight(5); // Ex: INFO 
-        string category = logEntry.Category; // ex: c.e.MyClass
+        string category = TruncateCategory(logEntry.Category); // ex: c.e.MyClass
         string msg = logEntry.Formatter(logEntry.State, logEntry.Exception);
 
         textWriter.WriteLine($"{timestamp}  {level} [{AppName}] {category} - {msg}");
+    }
+    
+    private string TruncateCategory(string fullCategory)
+    {
+        if (string.IsNullOrEmpty(fullCategory)) return "";
+
+        var parts = fullCategory.Split('.');
+        if (parts.Length == 1) return parts[0];
+        
+        var truncated = new List<string> { parts[0] };
+        
+        for (int i = 1; i < parts.Length - 1; i++)
+        {
+            truncated.Add(parts[i][0].ToString());
+        }
+        
+        truncated.Add(parts[^1]);
+
+        return string.Join('.', truncated);
     }
 }
