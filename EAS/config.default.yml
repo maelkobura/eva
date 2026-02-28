@@ -19,3 +19,6 @@ security:
     showPrivateKey: false
   pbkdf2:
     iterations: 100000
+    
+server:
+  port: 8080
