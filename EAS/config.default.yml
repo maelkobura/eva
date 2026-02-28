@@ -1,0 +1,16 @@
+﻿# Configuration file for EAS
+version: 1.0.0
+
+logging:
+  level: Information
+
+# Main configuration for PostgreSQL database management
+database:
+  # User authentication database
+  userAuthentification:
+    host: localhost
+    port: 5432
+    database: evauser
+    user: eas
+    password: eas123 # Change this
+

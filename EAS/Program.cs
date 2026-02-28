@@ -1,6 +1,7 @@
 ﻿
 using System.Runtime.InteropServices;
 using Eva.AuthorityServer.Security;
+using Eva.AuthorityServer.System;
 using Eva.AuthorityServer.User;
 using Eva.Commons.Util;
 using Microsoft.Extensions.Logging;
@@ -14,10 +15,16 @@ class Program
     {
         string configPath = "conf.yml";
         string nodeDir = "Contract";
+        var configOverride = new Dictionary<string, string>();
         
         var options = new OptionSet {
             { "c|config=", "Config path", n => configPath = n },
             { "n|nodes=", "Directory of Node Contract", n => nodeDir = n },
+            { "p|prop=:", "Property key value", (key, value) =>
+                {
+                    configOverride[key] = value;
+                }
+            }
         };
         
         try
@@ -30,15 +37,13 @@ class Program
             return;
         }
         
-        Console.WriteLine($"Config path: {configPath}");
-        Console.WriteLine($"Node directory: {nodeDir}");
         
         EvaLogger.Init();
         var log = EvaLogger.CreateLogger<Program>();
         log.LogInformation("Initializing EAS Systems...");
         log.LogInformation("Current Runtime: {}", RuntimeInformation.FrameworkDescription);
         
-        //Load Config
+        Configuration.Init(configPath, configOverride);
         
         KeysManager.Init();
         UserAuthenticator.Init();
