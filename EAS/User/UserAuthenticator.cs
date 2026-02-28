@@ -1,4 +1,5 @@
-﻿using Eva.Commons.Util;
+﻿using Eva.AuthorityServer.System;
+using Eva.Commons.Util;
 using Microsoft.Extensions.Logging;
 
 namespace Eva.AuthorityServer.User;
@@ -15,7 +16,13 @@ public class UserAuthenticator
         if (IsInitialized) return;
         logger.LogInformation("Initializing UserAuthenticator...");
         
-        string dbConnection = "Host=localhost;Database=evauser;Username=eas;Password=eas123"; //TODO: Change for config
+        string host = Configuration.Content["database:userAuthentification:host"] ?? "localhost";
+        string port = Configuration.Content["database:userAuthentification:port"] ?? "5432";
+        string database = Configuration.Content["database:userAuthentification:database"] ?? "evauser";
+        string user = Configuration.Content["database:userAuthentification:user"] ?? "eas";
+        string password = Configuration.Content["database:userAuthentification:password"] ?? "eas123";
+        
+        string dbConnection = $"Host={host};Port={port};Database={database};Username={user};Password={password}"; //TODO: Change for config
         
         context = new UserDatabaseContext(dbConnection);
         context.Database.EnsureCreated();

@@ -14,3 +14,8 @@ database:
     user: eas
     password: eas123 # Change this
 
+security:
+  keys:
+    showPrivateKey: false
+  pbkdf2:
+    iterations: 100000

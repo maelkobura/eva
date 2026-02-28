@@ -1,4 +1,5 @@
-﻿using Eva.Commons.Util;
+﻿using Eva.AuthorityServer.System;
+using Eva.Commons.Util;
 using Microsoft.Extensions.Logging;
 using NSec.Cryptography;
 
@@ -13,15 +14,15 @@ public class KeysManager
     
     public static bool IsInitialized { get; private set; } = false;
     
-    public static void Init(bool showPrivateKey = false)
+    public static void Init()
     {
         if (IsInitialized) return;
         logger.LogInformation("Initializing KeysManager...");
-        GenerateKeys(showPrivateKey);
+        GenerateKeys(Boolean.Parse(Configuration.Content["security:keys:showPrivateKey"] ?? "false"));
         logger.LogInformation("Public key: {}", 
             BitConverter.ToString(PublicKey.Export(KeyBlobFormat.RawPublicKey)).Replace("-", ""));
         logger.LogInformation("Private key: {}", 
-            showPrivateKey ? BitConverter.ToString(PrivateKey.Export(KeyBlobFormat.RawPrivateKey)).Replace("-", "") : "hidden");
+            Boolean.Parse(Configuration.Content["security:keys:showPrivateKey"] ?? "false") ? BitConverter.ToString(PrivateKey.Export(KeyBlobFormat.RawPrivateKey)).Replace("-", "") : "hidden");
         IsInitialized = true;
     }
 
