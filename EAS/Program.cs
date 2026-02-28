@@ -38,7 +38,7 @@ class Program
         }
         
         
-        EvaLogger.Init();
+        EvaLogger.Init("EAS");
         var log = EvaLogger.CreateLogger<Program>();
         log.LogInformation("Initializing EAS Systems...");
         log.LogInformation("Current Runtime: {}", RuntimeInformation.FrameworkDescription);
