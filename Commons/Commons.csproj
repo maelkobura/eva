@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="EmbedIO" Version="3.5.2" />
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.13" />
         <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.13" />
         <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.13" />
