@@ -1,6 +1,7 @@
 ﻿
 using System.Runtime.InteropServices;
 using Eva.AuthorityServer.Security;
+using Eva.AuthorityServer.Server;
 using Eva.AuthorityServer.System;
 using Eva.AuthorityServer.User;
 using Eva.Commons.Util;
@@ -50,6 +51,6 @@ class Program
         //CertificateManager
         //NodeRegistry
         //PermissionsManager
-        //EAS Server
+        AuthorityServerManager.Init();
     }
 }
