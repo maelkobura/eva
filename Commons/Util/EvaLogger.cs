@@ -8,8 +8,11 @@ public class EvaLogger
 {
     public static ILoggerFactory Factory { get; private set; }
 
+    public static bool IsInitialized { get; private set; } = false;
+    
     public static void Init(string appName = "Eva Application")
     {
+        if(IsInitialized) return;
         Factory = LoggerFactory.Create(builder =>
         {
             builder.ClearProviders();
@@ -20,6 +23,7 @@ public class EvaLogger
         });
         
         EvaFormatConsoleFormatter.AppName = appName;
+        IsInitialized = true;
     }
 
     public static ILogger CreateLogger<T>()
