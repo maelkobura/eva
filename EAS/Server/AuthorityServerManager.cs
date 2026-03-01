@@ -6,6 +6,9 @@ using Eva.AuthorityServer.Server.User;
 using Eva.AuthorityServer.System;
 using Eva.Commons.Util;
 using Microsoft.Extensions.Logging;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Diagnostics.Internal;
+using Swan.Logging;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Eva.AuthorityServer.Server;
 
@@ -22,6 +25,8 @@ public class AuthorityServerManager
         if (IsInitialized) return;
         logger.LogInformation("Initializing AuthorityServerManager...");
 
+        Swan.Logging.Logger.NoLogging();
+        
         server = new WebServer(o => o
                 .WithUrlPrefix($"http://localhost:{Configuration.Content["server:port"]}/")
                 .WithMode(HttpListenerMode.EmbedIO))
