@@ -6,14 +6,6 @@
         <LangVersion>latestmajor</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <RootNamespace>Eva.Node</RootNamespace>
     </PropertyGroup>
-
-    <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-    </ItemGroup>
 
 </Project>
