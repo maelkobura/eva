@@ -18,7 +18,7 @@ public class KeysManager
     {
         if (IsInitialized) return;
         logger.LogInformation("Initializing KeysManager...");
-        GenerateKeys(Boolean.Parse(Configuration.Content["security:keys:showPrivateKey"] ?? "false"));
+        GenerateKeys();
         logger.LogInformation("Public key: {}", 
             BitConverter.ToString(PublicKey.Export(KeyBlobFormat.RawPublicKey)).Replace("-", ""));
         logger.LogInformation("Private key: {}", 
@@ -26,14 +26,16 @@ public class KeysManager
         IsInitialized = true;
     }
 
-    private static void GenerateKeys(bool export)
+    private static void GenerateKeys()
     {
         logger.LogInformation("Generating Keys...");
         var algorithm = SignatureAlgorithm.Ed25519;
         PrivateKey = new Key(algorithm, new KeyCreationParameters
         {
-            ExportPolicy = export ? KeyExportPolicies.AllowPlaintextExport: KeyExportPolicies.None
+            ExportPolicy = KeyExportPolicies.AllowPlaintextExport
         });
         PublicKey = PrivateKey.PublicKey;
     }
+    
+    
 }
