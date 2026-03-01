@@ -13,6 +13,10 @@
       <ProjectReference Include="..\Commons\Commons.csproj" />
     </ItemGroup>
 
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DefineConstants>TEST</DefineConstants>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.13" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.13">
@@ -24,6 +28,10 @@
 
     <ItemGroup>
         <EmbeddedResource Include="config.default.yml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Security\Certificate\" />
     </ItemGroup>
 
 </Project>

@@ -47,4 +47,12 @@ public class Configuration
         
         IsInitialized = true;
     }
+    
+#if TEST
+    // uniquement visible pour le build de test
+    public static void SetContentForTest(IConfigurationRoot config)
+    {
+        Content = config;
+    }
+#endif
 }
