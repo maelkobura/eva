@@ -8,9 +8,9 @@ namespace Eva.AuthorityServer.Security;
 public class KeysManager
 {
     private static ILogger logger = EvaLogger.CreateLogger<KeysManager>();
-    
-    private static Key PrivateKey;
-    private static PublicKey PublicKey;
+
+    public static Key PrivateKey { get; private set; }
+    public static PublicKey PublicKey { get; private set; }
     
     public static bool IsInitialized { get; private set; } = false;
     
