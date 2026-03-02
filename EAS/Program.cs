@@ -53,5 +53,8 @@ class Program
         //NodeRegistry
         //PermissionsManager
         AuthorityServerManager.Init();
+        
+        AuthorityServerManager.Start();
+        Console.ReadKey(true);
     }
 }

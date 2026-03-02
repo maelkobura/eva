@@ -37,4 +37,10 @@ public class AuthorityServerManager
         
         IsInitialized = true;
     }
+
+    public static void Start()
+    {
+        server.Start();
+        logger.LogInformation("Server started on {}", server.Options.UrlPrefixes[0]);
+    }
 }
