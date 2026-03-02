@@ -26,6 +26,11 @@ public class EvaLogger
         IsInitialized = true;
     }
 
+    public static void ChangeName(string newName)
+    {
+        EvaFormatConsoleFormatter.AppName = newName;
+    }
+
     public static ILogger CreateLogger<T>()
     {
         return Factory.CreateLogger<T>();
