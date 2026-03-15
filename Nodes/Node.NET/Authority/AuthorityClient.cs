@@ -14,11 +14,13 @@ public class AuthorityClient
     
     private readonly AuthorityConnectionInfo? main;
     private readonly AuthorityConnectionInfo? backup;
+    private HttpClient client;
     
     private AuthorityClient(AuthorityConnectionInfo? main, AuthorityConnectionInfo? backup)
     {
         this.main = main;
         this.backup = backup;
+        this.client = new HttpClient();
     }
 
     public Uri GetMainUri()
@@ -29,6 +31,23 @@ public class AuthorityClient
     public Uri GetBackupUri()
     {
         return new Uri($"http://{backup.Host}:{backup.Port}");
+    }
+
+    public async Task<HttpResponseMessage> SendPostRequest(string route, HttpContent content)
+    {
+        var mainUri = new Uri(GetMainUri(), route);
+        var backupUri = new Uri(GetBackupUri(), route);
+
+        try
+        {
+            var response = await client.PostAsync(mainUri, content);
+
+            return response;
+        }
+        catch (HttpRequestException)
+        {
+            return await client.PostAsync(backupUri, content);
+        }
     }
     
     
