@@ -111,19 +111,13 @@ public class CertificateManager
             if (!SignatureAlgorithm.Ed25519.Verify(publicKey, signingInput, signature))
                 return null;
 
-            var payloadJson = Base64.Base64UrlDecode(parts[1]);
-            var payload = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(payloadJson);
+            var cert = CertificateUtil.ParseTokenPayload(token);
+            if (cert == null) return null;
 
-            if (payload is null) return null;
+            if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() > cert.Expiration)
+                return null;
 
-            var exp = payload["exp"].GetInt64();
-            if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() > exp) return null;
-
-            var name = payload["sub"].GetString()!;
-            var type = Enum.Parse<CertificateType>(payload["type"].GetString()!);
-            var roles = payload["roles"].EnumerateArray().Select(r => r.GetString()!).ToArray();
-
-            return new CertificateEntity(name, type, roles, exp);
+            return cert;
         }
         catch
         {
