@@ -8,4 +8,8 @@
         <RootNamespace>Eva.Services.User</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+        <EmbeddedResource Include="authorization.txt" />
+    </ItemGroup>
+
 </Project>
