@@ -52,7 +52,7 @@ class Program
         
         KeysManager.Init();
         UserAuthenticator.Init();
-        CertificateManager.Init(KeysManager.PublicKey, KeysManager.PrivateKey);
+        CertificateManager.Init(KeysManager.PublicKeyBase64, KeysManager.PrivateKeyBase64);
         NodeRegistry.Init(nodeDir);
         //PermissionsManager
         AuthorityServerManager.Init();

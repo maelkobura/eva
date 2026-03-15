@@ -24,7 +24,7 @@ public class NodeAuthentificationController : WebApiController{
         try
         {
             var nodeContract = NodeRegistry.Instance.GetContractByNameAndValidate(serviceName, token);
-            string cert = CertificateManager.GenerateCertificateForNode(nodeContract, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600);
+            var cert = CertificateManager.GenerateCertificate(nodeContract, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600);
             
             HttpContext.Response.StatusCode = 200;
             return cert;

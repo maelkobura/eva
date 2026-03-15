@@ -28,10 +28,10 @@ public class UserAuthentificationController : WebApiController {
         try
         {
             var user = UserAuthenticator.Login(username, code);
-            string cert = CertificateManager.GenerateCertificateForUser(user, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600);
+            var cert = CertificateManager.GenerateCertificate(user, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600);
             
             HttpContext.Response.StatusCode = 200;
-            return cert;
+            return new {code=200, cert=cert.Certificate, prv=cert.PrivateKey};
         }
         catch (Exception e)
         {

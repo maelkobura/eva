@@ -3,6 +3,7 @@ using System.Text.Json;
 using EmbedIO;
 using Eva.AuthorityServer.Nodes;
 using Eva.AuthorityServer.User;
+using Eva.Commons.Security;
 using Eva.Commons.Security.Certificate;
 using Eva.Commons.Util;
 using Jose;
@@ -18,10 +19,10 @@ public class CertificateManager
     
     public static bool IsInitialized { get; private set; } = false;
 
-    private static PublicKey publicKey;
-    private static Key privateKey;
+    private static string publicKey;
+    private static string privateKey;
 
-    public static void Init(PublicKey publicKey, Key privateKey)
+    public static void Init(string publicKey, string privateKey)
     {
         if (IsInitialized) return;
         CertificateManager.publicKey = publicKey;
@@ -29,72 +30,65 @@ public class CertificateManager
         IsInitialized = true;
     }
 
-    public static string GenerateCertificateForUser(UserEntity user, long unixTime)
+    public static CertificatePackage GenerateCertificate(object entity, long unixTime)
     {
+        string subject;
+        string[] roles;
+        CertificateType type;
+
+        switch (entity)
+        {
+            case UserEntity user:
+                subject = user.Username;
+                roles = user.Authorizations.ToArray();
+                type = CertificateType.User;
+                break;
+
+            case NodeContract node:
+                subject = node.Name;
+                roles = node.Authorization.ToArray();
+                type = CertificateType.Node;
+                break;
+
+            default:
+                throw new ArgumentException("Entity type not supported for certificate generation");
+        }
+        
+        var (userPublicKey, userPrivateKey) = KeysManagement.GenerateKeyPair();
+
         // Header
         var headerJson = JsonSerializer.SerializeToUtf8Bytes(new
         {
             alg = "EdDSA",
             crv = "Ed25519",
-            typ = "JWT"
+            typ = "EVACERT"
         });
 
         // Payload
         var payloadJson = JsonSerializer.SerializeToUtf8Bytes(new
         {
-            sub = user.Username,
-            pub = Convert.ToBase64String(publicKey.Export(KeyBlobFormat.RawPublicKey)),
+            sub = subject,
+            pub = userPublicKey,
             exp = unixTime,
-            type = CertificateType.User,
-            roles = user.Authorizations.ToArray()
+            type,
+            roles
         });
 
         var header = Base64.Base64UrlEncode(headerJson);
         var payload = Base64.Base64UrlEncode(payloadJson);
+        
+        var signature = KeysManagement.SignMessage(privateKey, $"{header}.{payload}");
+        
+        var token = $"{header}.{payload}.{Base64.Base64UrlEncode(Convert.FromBase64String(signature))}";
 
-        // Signing input = "header.payload"
-        var signingInput = Encoding.UTF8.GetBytes($"{header}.{payload}");
+        logger.LogInformation(
+            "Generated certificate for {} {} (expiration: {}s)",
+            type,
+            subject,
+            unixTime
+        );
 
-        // Signature Ed25519 via NSec
-        var signature = SignatureAlgorithm.Ed25519.Sign(privateKey, signingInput);
-
-        var token = $"{header}.{payload}.{Base64.Base64UrlEncode(signature)}";
-        logger.LogInformation("Generated certificate for user {} (expiration: {}s)", user.Username, unixTime);
-        return token;
-    }
-    
-    public static string GenerateCertificateForNode(NodeContract node, long unixTime)
-    {
-        // Header
-        var headerJson = JsonSerializer.SerializeToUtf8Bytes(new
-        {
-            alg = "EdDSA",
-            crv = "Ed25519",
-            typ = "JWT"
-        });
-
-        // Payload
-        var payloadJson = JsonSerializer.SerializeToUtf8Bytes(new
-        {
-            sub = node.Name,
-            pub = Convert.ToBase64String(publicKey.Export(KeyBlobFormat.RawPublicKey)),
-            exp = unixTime,
-            type = CertificateType.Node,
-            roles = node.Authorization.ToArray()
-        });
-
-        var header = Base64.Base64UrlEncode(headerJson);
-        var payload = Base64.Base64UrlEncode(payloadJson);
-
-        // Signing input = "header.payload"
-        var signingInput = Encoding.UTF8.GetBytes($"{header}.{payload}");
-
-        // Signature Ed25519 via NSec
-        var signature = SignatureAlgorithm.Ed25519.Sign(privateKey, signingInput);
-
-        var token = $"{header}.{payload}.{Base64.Base64UrlEncode(signature)}";
-        logger.LogInformation("Generated certificate for node {} (expiration: {}s)", node.Name, unixTime);
-        return token;
+        return new CertificatePackage(token, userPrivateKey);
     }
     
 
@@ -105,10 +99,7 @@ public class CertificateManager
             var parts = token.Split('.');
             if (parts.Length != 3) return null;
 
-            var signingInput = Encoding.UTF8.GetBytes($"{parts[0]}.{parts[1]}");
-            var signature = Base64.Base64UrlDecode(parts[2]);
-
-            if (!SignatureAlgorithm.Ed25519.Verify(publicKey, signingInput, signature))
+            if (!KeysManagement.VerifySignature(publicKey, $"{parts[0]}.{parts[1]}", parts[2]))
                 return null;
 
             var cert = CertificateUtil.ParseTokenPayload(token);
