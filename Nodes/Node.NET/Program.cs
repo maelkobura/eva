@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using Eva.AuthorityServer.System;
 using Eva.Commons.Util;
 using Eva.Node.Authority;
+using Eva.Node.Authority.Certificate;
 using Eva.Node.Loader;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -43,3 +44,6 @@ log.LogInformation("Service Authorization Count: {Count} authorizations", descri
 AuthorityClient.Init(
     Configuration.Content.GetSection("eas:main").Get<AuthorityConnectionInfo>(), 
     Configuration.Content.GetSection("eas:backup").Get<AuthorityConnectionInfo>());
+
+CertificateManager.Init(Configuration.Content.GetSection("authentification:token").Get<string>());
+CertificateManager.Instance.GenerateCertificate(description.Name);
