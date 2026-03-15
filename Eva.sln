@@ -12,6 +12,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.EAS", "Tests\Tests.EA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Node.NET", "Nodes\Node.NET\Node.NET.csproj", "{7C36EB99-FB95-407E-A66F-A057DC7F4161}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{688330BE-A2B7-4D60-A8DD-0F6E7B1FB83F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{414A83A6-41D5-432A-B41A-C5BBA879CE0A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{C74DDD79-96E9-4A3C-9600-56169D47ADEA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User", "Services\User\User.csproj", "{FBA23A33-BD20-47DB-A1C3-61FDBB2A9192}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,6 +42,10 @@ Global
 		{7C36EB99-FB95-407E-A66F-A057DC7F4161}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C36EB99-FB95-407E-A66F-A057DC7F4161}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C36EB99-FB95-407E-A66F-A057DC7F4161}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBA23A33-BD20-47DB-A1C3-61FDBB2A9192}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBA23A33-BD20-47DB-A1C3-61FDBB2A9192}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBA23A33-BD20-47DB-A1C3-61FDBB2A9192}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBA23A33-BD20-47DB-A1C3-61FDBB2A9192}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{DA6EBC36-460E-472E-A2B4-14F45FD256AB} = {0FF190BC-FF2F-41CB-A3D5-C2423BD2716F}
