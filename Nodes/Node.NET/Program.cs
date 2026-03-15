@@ -1,3 +1,13 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using Eva.Commons.Util;
+using Microsoft.Extensions.Logging;
+using Mono.Options;
 
-Console.WriteLine("Hello, World!");
+string nodeConfigPath = "node.yml";
+
+var options = new OptionSet {
+    { "nc|nodeconfig=", "Node config path", n => nodeConfigPath = n }
+};
+
+EvaLogger.Init("Node");
+var log = EvaLogger.CreateLogger<Program>();
+log.LogInformation("Initializing Eva Node (.NET)...");
