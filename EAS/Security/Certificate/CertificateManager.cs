@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 using EmbedIO;
+using Eva.AuthorityServer.Nodes;
 using Eva.AuthorityServer.User;
 using Eva.Commons.Security.Certificate;
 using Eva.Commons.Util;
@@ -44,7 +45,7 @@ public class CertificateManager
             sub = user.Username,
             pub = Convert.ToBase64String(publicKey.Export(KeyBlobFormat.RawPublicKey)),
             exp = unixTime,
-            type = "User",
+            type = CertificateType.User,
             roles = user.Authorizations.ToArray()
         });
 
@@ -59,6 +60,40 @@ public class CertificateManager
 
         var token = $"{header}.{payload}.{Base64.Base64UrlEncode(signature)}";
         logger.LogInformation("Generated certificate for user {} (expiration: {}s)", user.Username, unixTime);
+        return token;
+    }
+    
+    public static string GenerateCertificateForNode(NodeContract node, long unixTime)
+    {
+        // Header
+        var headerJson = JsonSerializer.SerializeToUtf8Bytes(new
+        {
+            alg = "EdDSA",
+            crv = "Ed25519",
+            typ = "JWT"
+        });
+
+        // Payload
+        var payloadJson = JsonSerializer.SerializeToUtf8Bytes(new
+        {
+            sub = node.Name,
+            pub = Convert.ToBase64String(publicKey.Export(KeyBlobFormat.RawPublicKey)),
+            exp = unixTime,
+            type = CertificateType.Node,
+            roles = node.Authorization.ToArray()
+        });
+
+        var header = Base64.Base64UrlEncode(headerJson);
+        var payload = Base64.Base64UrlEncode(payloadJson);
+
+        // Signing input = "header.payload"
+        var signingInput = Encoding.UTF8.GetBytes($"{header}.{payload}");
+
+        // Signature Ed25519 via NSec
+        var signature = SignatureAlgorithm.Ed25519.Sign(privateKey, signingInput);
+
+        var token = $"{header}.{payload}.{Base64.Base64UrlEncode(signature)}";
+        logger.LogInformation("Generated certificate for node {} (expiration: {}s)", node.Name, unixTime);
         return token;
     }
     
