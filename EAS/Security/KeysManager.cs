@@ -20,9 +20,9 @@ public class KeysManager
         logger.LogInformation("Initializing KeysManager...");
         GenerateKeys();
         logger.LogInformation("Public key: {}", 
-            BitConverter.ToString(PublicKey.Export(KeyBlobFormat.RawPublicKey)).Replace("-", ""));
+            Convert.ToBase64String(PublicKey.Export(KeyBlobFormat.NSecPublicKey)));
         logger.LogInformation("Private key: {}", 
-            Boolean.Parse(Configuration.Content["security:keys:showPrivateKey"] ?? "false") ? BitConverter.ToString(PrivateKey.Export(KeyBlobFormat.RawPrivateKey)).Replace("-", "") : "hidden");
+            Boolean.Parse(Configuration.Content["security:keys:showPrivateKey"] ?? "false") ? Convert.ToBase64String(PrivateKey.Export(KeyBlobFormat.NSecPrivateKey)) : "hidden");
         IsInitialized = true;
     }
 
