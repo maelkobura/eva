@@ -1,6 +1,7 @@
 ﻿
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Eva.AuthorityServer.Nodes;
 using Eva.AuthorityServer.Security;
 using Eva.AuthorityServer.Security.Certificate;
 using Eva.AuthorityServer.Server;
@@ -52,7 +53,7 @@ class Program
         KeysManager.Init();
         UserAuthenticator.Init();
         CertificateManager.Init(KeysManager.PublicKey, KeysManager.PrivateKey);
-        //NodeRegistry
+        NodeRegistry.Init(nodeDir);
         //PermissionsManager
         AuthorityServerManager.Init();
         
