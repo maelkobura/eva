@@ -1,4 +1,5 @@
 ﻿
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Eva.AuthorityServer.Security;
 using Eva.AuthorityServer.Security.Certificate;
@@ -45,7 +46,8 @@ class Program
         log.LogInformation("Initializing EAS Systems...");
         log.LogInformation("Current Runtime: {}", RuntimeInformation.FrameworkDescription);
         
-        Configuration.Init(configPath, configOverride);
+        using var templateStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Eva.AuthorityServer.config.default.yml");
+        Configuration.Init(configPath, configOverride, templateStream);
         
         KeysManager.Init();
         UserAuthenticator.Init();

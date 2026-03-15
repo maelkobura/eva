@@ -1,10 +1,7 @@
 ﻿using System.Reflection;
 using Eva.Commons.Util;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace Eva.AuthorityServer.System;
 
@@ -16,7 +13,7 @@ public class Configuration
 
     public static bool IsInitialized { get; private set; } = false;
 
-    public static void Init(String configPath, Dictionary<string, string> overrideConfig)
+    public static void Init(String configPath, Dictionary<string, string> overrideConfig, Stream? templateStream)
     {
         if (IsInitialized) return;
 
@@ -31,12 +28,13 @@ public class Configuration
             string defaultYaml = reader.ReadToEnd();
             File.WriteAllText(configPath, defaultYaml);
         }
-        
-        using var templateStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Eva.AuthorityServer.config.default.yml");
 
-        var configBuilder = new ConfigurationBuilder()
-            .AddYamlStream(templateStream)
-            .AddYamlFile(configPath)
+        var configBuilder = new ConfigurationBuilder();
+            
+        if(templateStream != null) configBuilder.AddYamlStream(templateStream);
+        else logger.LogWarning("No template provided, configuration might be incomplete.");
+            
+        configBuilder.AddYamlFile(configPath)
             .AddEnvironmentVariables()
             .AddInMemoryCollection(overrideConfig.ToDictionary(
                 kvp => kvp.Key.Replace('.', ':'),

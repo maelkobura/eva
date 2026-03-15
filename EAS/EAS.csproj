@@ -30,8 +30,4 @@
         <EmbeddedResource Include="config.default.yml" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Security\Certificate\" />
-    </ItemGroup>
-
 </Project>
