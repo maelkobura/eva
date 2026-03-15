@@ -1,0 +1,18 @@
+﻿# Configuration file for Eva Node
+version: 1.0.0
+platform: .NET
+
+logging:
+  level: Information
+  
+authentification:
+  token: "no token"
+  
+eas:
+  main:
+    host: localhost
+    port: 8080
+    
+nodes:
+  max-connection: 0 # 0 = infinite
+  
