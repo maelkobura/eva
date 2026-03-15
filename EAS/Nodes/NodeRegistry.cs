@@ -95,4 +95,17 @@ public class NodeRegistry
         logger.LogInformation("Created node contract: {Name}", Name);
         LoadNodeContract(file);
     }
+
+    public NodeContract? GetContractByName(string name)
+    {
+        return NodeContracts.FirstOrDefault(c => c.Name == name);
+    }
+
+    public NodeContract GetContractByNameAndValidate(string name, string token)
+    {
+        var contract = GetContractByName(name);
+        if(contract == null) throw new Exception("Node contract not found");
+        if(contract.token != token) throw new Exception("Node contract doesn't match");
+        return contract;
+    }
 }
