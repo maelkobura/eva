@@ -13,4 +13,9 @@
         <ProjectReference Include="..\..\Commons\Commons.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <EmbeddedResource Include="node.default.yml" />
+    </ItemGroup>
+
+
 </Project>

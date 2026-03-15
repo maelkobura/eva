@@ -18,13 +18,13 @@ public class Configuration
         if (IsInitialized) return;
 
         logger.LogInformation("Initializing Configuration...");
+        if(templateStream == null) logger.LogWarning("No template provided, configuration might be incomplete.");
         
-        if (!File.Exists(configPath))
+        if (!File.Exists(configPath) && templateStream != null)
         {
             logger.LogInformation("Configuration file not found, generating default configuration.");
             var assembly = Assembly.GetExecutingAssembly();
-            using var stream = assembly.GetManifestResourceStream("Eva.AuthorityServer.config.default.yml");
-            using var reader = new StreamReader(stream!);
+            using var reader = new StreamReader(templateStream);
             string defaultYaml = reader.ReadToEnd();
             File.WriteAllText(configPath, defaultYaml);
         }
@@ -32,7 +32,6 @@ public class Configuration
         var configBuilder = new ConfigurationBuilder();
             
         if(templateStream != null) configBuilder.AddYamlStream(templateStream);
-        else logger.LogWarning("No template provided, configuration might be incomplete.");
             
         configBuilder.AddYamlFile(configPath)
             .AddEnvironmentVariables()
