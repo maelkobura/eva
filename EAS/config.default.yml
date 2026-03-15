@@ -3,6 +3,10 @@ version: 1.0.0
 
 logging:
   level: Information
+  
+debug:
+  authentification:
+    skip: false
 
 # Main configuration for PostgreSQL database management
 database:
