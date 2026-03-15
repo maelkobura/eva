@@ -22,7 +22,9 @@ public class CertificateManager
 
     private readonly string token;
     private string certificateRaw;
+    private string easCertificateRaw;
     private CertificateEntity certificate;
+    private CertificateEntity easCertificate;
     private string PrivateKey;
     
     private CertificateManager(string token)
@@ -48,9 +50,14 @@ public class CertificateManager
         var responseJson = JObject.Parse(response.Content.ReadAsStringAsync().Result) ?? throw new Exception("EAS response is empty");
         certificateRaw = (string)responseJson["cert"]! ?? throw new Exception("Certificate not found in response");
         PrivateKey = (string)responseJson["prv"] ?? throw new Exception("Private key not found in response");
+        
+        easCertificateRaw = (string)responseJson["eas"]! ?? throw new Exception("EAS certificate not found in response");
+        easCertificate = CertificateUtil.ParseTokenPayload(easCertificateRaw) ?? throw new Exception("EAS certificate parsing failed");
+        AuthorityClient.Instance.EasCertificate = easCertificateRaw;
+        
         certificate = CertificateUtil.ParseTokenPayload(certificateRaw) ?? throw new Exception("Certificate parsing failed");
 
-        logger.LogInformation("Node certificate created.");
+        logger.LogInformation("Successfully created certificate.");
     }
     
 }

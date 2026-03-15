@@ -11,6 +11,8 @@ public class AuthorityClient
         if (Instance != null) return;
         Instance = new AuthorityClient(main, backup);
     }
+
+    public string EasCertificate;
     
     private readonly AuthorityConnectionInfo? main;
     private readonly AuthorityConnectionInfo? backup;
@@ -38,6 +40,10 @@ public class AuthorityClient
         var mainUri = new Uri(GetMainUri(), route);
         var backupUri = new Uri(GetBackupUri(), route);
 
+        if (!string.IsNullOrEmpty(EasCertificate)) {
+            content.Headers.Add("Authorization", $"Bearer {EasCertificate}");
+        }
+        
         try
         {
             var response = await client.PostAsync(mainUri, content);

@@ -27,7 +27,7 @@ public class NodeAuthentificationController : WebApiController{
             var cert = CertificateManager.GenerateCertificate(nodeContract, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600);
             
             HttpContext.Response.StatusCode = 200;
-            return cert;
+            return new {code=200, cert=cert.Certificate, eas=cert.AuthorityCertificate, prv=cert.PrivateKey};
         }
         catch (Exception e)
         {

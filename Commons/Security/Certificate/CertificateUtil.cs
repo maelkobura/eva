@@ -19,15 +19,17 @@ public class CertificateUtil
 
             var exp = payload["exp"].GetInt64();
             var name = payload["sub"].GetString()!;
-            var type = Enum.Parse<CertificateType>(payload["type"].GetString()!);
+            var uniqueId = payload["uid"].GetString()!;
+            var type = (CertificateType)payload["type"].GetInt32()!;
             var roles = payload["roles"].EnumerateArray()
                 .Select(r => r.GetString()!)
                 .ToArray();
+            var eas = payload["eas"].GetBoolean();
 
-            return new CertificateEntity(name, type, roles, exp);
+            return new CertificateEntity(name, uniqueId, type, roles, exp, eas);
         }
-        catch
-        {
+        catch (Exception e) {
+            Console.WriteLine(e);
             return null;
         }
     }

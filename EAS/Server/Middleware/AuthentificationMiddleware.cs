@@ -23,13 +23,13 @@ public class AuthentificationMiddleware : WebModuleBase{
             Console.WriteLine(ctx.RequestedPath);
             if (Configuration.Content["debug:authentification:skip"] == "true") {
                 
-                ctx.Items["certificate"] = new CertificateEntity("debug.user", CertificateType.User, new string[] { "*" }, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600);
+                ctx.Items["certificate"] = new CertificateEntity("debug.user", "EVA", CertificateType.User, new string[] { "*" }, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600, true);
                 
             } else if (_excludedPaths.Any(p => ctx.RequestedPath.StartsWith(p, StringComparison.OrdinalIgnoreCase))) {
                 
             } else {
                 var certRaw = CertificateManager.GetCertificate(ctx);
-                var cert = CertificateManager.ValidateCertificate(certRaw);
+                var cert = CertificateManager.ValidateCertificate(certRaw, true);
                 if (cert == null)
                 {
                     throw new Exception("Invalid token or expirated");

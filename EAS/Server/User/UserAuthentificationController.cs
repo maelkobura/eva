@@ -31,7 +31,7 @@ public class UserAuthentificationController : WebApiController {
             var cert = CertificateManager.GenerateCertificate(user, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600);
             
             HttpContext.Response.StatusCode = 200;
-            return new {code=200, cert=cert.Certificate, prv=cert.PrivateKey};
+            return new {code=200, cert=cert.Certificate, eas=cert.AuthorityCertificate, prv=cert.PrivateKey};
         }
         catch (Exception e)
         {
