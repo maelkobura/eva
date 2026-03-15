@@ -2,7 +2,9 @@
 using System.Runtime.InteropServices;
 using Eva.AuthorityServer.System;
 using Eva.Commons.Util;
+using Eva.Node.Authority;
 using Eva.Node.Loader;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Mono.Options;
 
@@ -37,3 +39,7 @@ log.LogInformation("Service Description: {Description}", description.Description
 log.LogInformation("Service Author: {Author}", description.Author);
 log.LogInformation("Service License: {License}", description.License);
 log.LogInformation("Service Authorization Count: {Count} authorizations", description.Authorization?.Length ?? 0);
+
+AuthorityClient.Init(
+    Configuration.Content.GetSection("eas:main").Get<AuthorityConnectionInfo>(), 
+    Configuration.Content.GetSection("eas:backup").Get<AuthorityConnectionInfo>());
