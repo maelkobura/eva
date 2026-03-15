@@ -31,7 +31,7 @@ public class AuthorityServerManager
                 .WithUrlPrefix($"http://localhost:{Configuration.Content["server:port"]}/")
                 .WithMode(HttpListenerMode.EmbedIO))
             .WithModule(new NodeWebSocketHandler("/nodes"))
-            .WithWebApi("/user", o => o.WithController<UserController>());
+            .WithWebApi("/user/auth", o => o.WithController<UserAuthentificationController>());
             
         
         
