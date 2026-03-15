@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using Eva.AuthorityServer.System;
 using Eva.Commons.Util;
+using Eva.Node.Loader;
 using Microsoft.Extensions.Logging;
 using Mono.Options;
 
@@ -19,6 +20,8 @@ var options = new OptionSet {
     }
 };
 
+options.Parse(args);
+
 EvaLogger.Init("Node");
 var log = EvaLogger.CreateLogger<Program>();
 log.LogInformation("Initializing Eva Node (.NET)...");
@@ -26,3 +29,11 @@ log.LogInformation("Current Runtime: {}", RuntimeInformation.FrameworkDescriptio
 using var templateStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Eva.Node.node.default.yml");
 
 Configuration.Init(nodeConfigPath, configOverride, templateStream);
+
+AssemblyLoader.Init(serviceBinaryPath);
+var description = AssemblyLoader.Instance!.LoadDescription();
+log.LogInformation("Service Information: {DisplayName} ({Name}) - Ver {Version}", description.DisplayName, description.Name, description.Version);
+log.LogInformation("Service Description: {Description}", description.Description);
+log.LogInformation("Service Author: {Author}", description.Author);
+log.LogInformation("Service License: {License}", description.License);
+log.LogInformation("Service Authorization Count: {Count} authorizations", description.Authorization?.Length ?? 0);
