@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using EmbedIO;
 using Eva.AuthorityServer.User;
 using Eva.Commons.Security.Certificate;
 using Eva.Commons.Util;
@@ -93,5 +94,18 @@ public class CertificateManager
         {
             return null;
         }
+    }
+
+    public static string GetCertificate(IHttpContext context)
+    {
+        // Récupérer l'en-tête Authorization
+        var authHeader = context.Request.Headers["Authorization"];
+
+        if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+        {
+            throw new Exception("No Cert found");
+        }
+        
+        return authHeader.Substring("Bearer ".Length).Trim();
     }
 }
