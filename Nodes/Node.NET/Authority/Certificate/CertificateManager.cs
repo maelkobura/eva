@@ -1,6 +1,11 @@
-﻿using Eva.Commons.Security.Certificate;
+﻿using System.Text;
+using System.Text.Json.Nodes;
+using Eva.Commons.Security.Certificate;
 using Eva.Commons.Util;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Swan.Formatters;
 
 namespace Eva.Node.Authority.Certificate;
 
@@ -18,13 +23,14 @@ public class CertificateManager
     private readonly string token;
     private string certificateRaw;
     private CertificateEntity certificate;
+    private string PrivateKey;
     
     private CertificateManager(string token)
     {
         this.token = token;
     }
     
-    public void GenerateCertificate()
+    public void GenerateCertificate(string serviceName)
     {
         if (certificateRaw == null)
         {
@@ -34,8 +40,17 @@ public class CertificateManager
         {
             logger.LogInformation("Refreshing node certificate...");
         }
-        
-        //TODO Fetch EAS
+
+        string json = JsonConvert.SerializeObject(new { service = serviceName, token });
+        HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+        var response = AuthorityClient.Instance!.SendPostRequest("/node/auth", content).Result;
+        response.EnsureSuccessStatusCode();
+        var responseJson = JObject.Parse(response.Content.ReadAsStringAsync().Result) ?? throw new Exception("EAS response is empty");
+        certificateRaw = (string)responseJson["cert"]! ?? throw new Exception("Certificate not found in response");
+        PrivateKey = (string)responseJson["prv"] ?? throw new Exception("Private key not found in response");
+        certificate = CertificateUtil.ParseTokenPayload(certificateRaw) ?? throw new Exception("Certificate parsing failed");
+
+        logger.LogInformation("Node certificate created.");
     }
     
 }
