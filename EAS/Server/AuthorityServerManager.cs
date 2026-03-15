@@ -34,6 +34,7 @@ public class AuthorityServerManager
                 .WithMode(HttpListenerMode.EmbedIO))
                 .WithModule(new AuthentificationMiddleware("/"))
                 .WithWebApi("/node/manage", o => o.WithController<NodeManagerController>())
+                .WithWebApi("/node/auth", o => o.WithController<NodeAuthentificationController>())
             .WithWebApi("/user/auth", o => o.WithController<UserAuthentificationController>());
         
         
