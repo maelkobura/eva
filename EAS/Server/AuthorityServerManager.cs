@@ -28,14 +28,15 @@ public class AuthorityServerManager
         logger.LogInformation("Initializing AuthorityServerManager...");
 
         Swan.Logging.Logger.NoLogging();
-        
+
         server = new WebServer(o => o
                 .WithUrlPrefix($"http://localhost:{Configuration.Content["server:port"]}/")
                 .WithMode(HttpListenerMode.EmbedIO))
-                .WithModule(new AuthentificationMiddleware("/"))
-                .WithWebApi("/node/manage", o => o.WithController<NodeManagerController>())
-                .WithWebApi("/node/auth", o => o.WithController<NodeAuthentificationController>())
-            .WithWebApi("/user/auth", o => o.WithController<UserAuthentificationController>());
+            .WithModule(new AuthentificationMiddleware("/"))
+            .WithWebApi("/node/manage", o => o.WithController<NodeManagerController>())
+            .WithWebApi("/node/auth", o => o.WithController<NodeAuthentificationController>())
+            .WithWebApi("/user/auth", o => o.WithController<UserAuthentificationController>())
+            .WithWebApi("/", o => o.WithController<RootController>());
         
         
         IsInitialized = true;
