@@ -23,7 +23,6 @@ public class Configuration
         if (!File.Exists(configPath) && templateStream != null)
         {
             logger.LogInformation("Configuration file not found, generating default configuration.");
-            var assembly = Assembly.GetExecutingAssembly();
             using var reader = new StreamReader(templateStream);
             string defaultYaml = reader.ReadToEnd();
             File.WriteAllText(configPath, defaultYaml);
