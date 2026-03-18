@@ -56,6 +56,36 @@ public class AuthorityClient
         }
     }
     
+    public async Task<HttpResponseMessage> SendGetRequest(string route)
+    {
+        var mainUri = new Uri(GetMainUri(), route);
+        var backupUri = new Uri(GetBackupUri(), route);
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, mainUri);
+
+        if (!string.IsNullOrEmpty(EasCertificate))
+        {
+            request.Headers.Add("Authorization", $"Bearer {EasCertificate}");
+        }
+
+        try
+        {
+            var response = await client.SendAsync(request);
+            return response;
+        }
+        catch (HttpRequestException)
+        {
+            using var backupRequest = new HttpRequestMessage(HttpMethod.Get, backupUri);
+
+            if (!string.IsNullOrEmpty(EasCertificate))
+            {
+                backupRequest.Headers.Add("Authorization", $"Bearer {EasCertificate}");
+            }
+
+            return await client.SendAsync(backupRequest);
+        }
+    }
+    
     
     
     
