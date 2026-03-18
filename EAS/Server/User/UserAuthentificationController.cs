@@ -3,9 +3,11 @@ using System.Text.Json;
 using EmbedIO;
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
+using Eva.AuthorityServer.Security;
 using Eva.AuthorityServer.Security.Certificate;
 using Eva.AuthorityServer.User;
 using Eva.Commons.Security.Certificate;
+using Google.Protobuf;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
@@ -31,7 +33,7 @@ public class UserAuthentificationController : WebApiController {
             var cert = CertificateManager.GenerateCertificate(user, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600);
             
             HttpContext.Response.StatusCode = 200;
-            return new {code=200, cert=cert.Certificate, eas=cert.AuthorityCertificate, prv=cert.PrivateKey};
+            return new {code=200, cert=cert.EntityCertificateUnit.ToByteString().ToBase64(), eas=cert.AuthorityCertificateUnit.ToByteString().ToBase64(), prv=cert.PrivateKey};
         }
         catch (Exception e)
         {
@@ -46,17 +48,14 @@ public class UserAuthentificationController : WebApiController {
         try
         {
             var body = CertificateManager.GetCertificate(HttpContext);
-            CertificateEntity? cert = CertificateManager.ValidateCertificate(body);
-            if (cert == null)
+            var cert = CertificateUtil.ParseCertificateBase64(body);
+            if (!CertificateUtil.CheckCertificate(cert, KeysManager.PublicKeyBase64))
             {
                 throw new Exception("Invalid token or expirated");
             }
-            string name = cert.Name;
-            string type = cert.Type.ToString();
-            string[] auth = cert.Authorization;
         
             HttpContext.Response.StatusCode = 200;
-            return new {code=200,name, type, authorizations=auth};
+            return new {code=200,certificate=JsonSerializer.CreateDefault().Deserialize(new JsonTextReader(new StringReader(JsonFormatter.Default.Format(cert))))};
         }
         catch (Exception e)
         {

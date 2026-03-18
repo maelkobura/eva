@@ -1,36 +1,61 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using Eva.Commons.Util;
+using Google.Protobuf;
+using NSec.Cryptography;
 
 namespace Eva.Commons.Security.Certificate;
 
 public class CertificateUtil
 {
-    public static CertificateEntity? ParseTokenPayload(string token)
+    public static Certificate? ParseCertificateBase64(string rawCert)
     {
         try
         {
-            var parts = token.Split('.');
-            if (parts.Length != 3) return null;
-
-            var payloadJson = Base64.Base64UrlDecode(parts[1]);
-            var payload = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(payloadJson);
-
-            if (payload is null) return null;
-
-            var exp = payload["exp"].GetInt64();
-            var name = payload["sub"].GetString()!;
-            var uniqueId = payload["uid"].GetString()!;
-            var type = (CertificateType)payload["type"].GetInt32()!;
-            var roles = payload["roles"].EnumerateArray()
-                .Select(r => r.GetString()!)
-                .ToArray();
-            var eas = payload["eas"].GetBoolean();
-
-            return new CertificateEntity(name, uniqueId, type, roles, exp, eas);
+            byte[] bytes = Convert.FromBase64String(rawCert);
+            return Certificate.Parser.ParseFrom(bytes);
         }
         catch (Exception e) {
-            Console.WriteLine(e);
             return null;
+        }
+    }
+
+    public static Certificate SignCertificate(CertificatePayload payload, string privateKeyBase64, string? publicKeyBase64 = null)
+    {
+        if (!string.IsNullOrEmpty(publicKeyBase64))
+            payload.Content.SignaturePublicKey = publicKeyBase64;
+
+        byte[] data = payload.ToByteArray();
+        var privateBytes = Convert.FromBase64String(privateKeyBase64);
+
+        using var privateKey = Key.Import(SignatureAlgorithm.Ed25519, privateBytes, KeyBlobFormat.RawPrivateKey);
+
+        byte[] signatureBytes = SignatureAlgorithm.Ed25519.Sign(privateKey, data);
+
+        return new Certificate
+        {
+            Payload = payload,
+            Signature = Convert.ToBase64String(signatureBytes)
+        };
+    }
+
+    public static bool CheckCertificate(Certificate? cert, string? publicKeyBase64 = null)
+    {
+        if (cert == null) return false;
+
+        try
+        {
+            var publicBytes = Convert.FromBase64String(publicKeyBase64 ?? cert.Payload.Content.SignaturePublicKey);
+
+            var publicKey = PublicKey.Import(SignatureAlgorithm.Ed25519, publicBytes, KeyBlobFormat.RawPublicKey);
+
+            var data = cert.Payload.ToByteArray();
+
+            return SignatureAlgorithm.Ed25519.Verify(publicKey, data, Convert.FromBase64String(cert.Signature));
+        }
+        catch
+        {
+            return false;
         }
     }
 }

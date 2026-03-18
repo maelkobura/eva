@@ -1,15 +1,17 @@
-﻿using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using EmbedIO;
 using Eva.AuthorityServer.Nodes;
 using Eva.AuthorityServer.User;
 using Eva.Commons.Security;
 using Eva.Commons.Security.Certificate;
 using Eva.Commons.Util;
+using Google.Protobuf.Collections;
 using Jose;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Logging;
 using NSec.Cryptography;
+using Type = Eva.Commons.Security.Certificate.Type;
+using Version = Eva.Commons.Security.Certificate.Version;
 
 namespace Eva.AuthorityServer.Security.Certificate;
 
@@ -29,114 +31,63 @@ public class CertificateManager
         CertificateManager.privateKey = privateKey;
         IsInitialized = true;
     }
-
-public static CertificatePackage GenerateCertificate(object entity, long unixTime)
-{
-    string subject;
-    string[] roles;
-    CertificateType type;
-
-    switch (entity)
-    {
-        case UserEntity user:
-            subject = user.Username;
-            roles = user.Authorizations.ToArray();
-            type = CertificateType.User;
-            break;
-
-        case NodeContract node:
-            subject = node.Name;
-            roles = node.Authorization.ToArray();
-            type = CertificateType.Node;
-            break;
-
-        default:
-            throw new ArgumentException("Entity type not supported for certificate generation");
-    }
-
-    // Génération de la paire de clés
-    var (userPublicKey, userPrivateKey) = KeysManagement.GenerateKeyPair();
-
-    // --- Création du JWT public ---
-    var headerJson = JsonSerializer.SerializeToUtf8Bytes(new
-    {
-        alg = "EdDSA",
-        crv = "Ed25519",
-        typ = "EVACERT"
-    });
-
-    var payloadJson = JsonSerializer.SerializeToUtf8Bytes(new
-    {
-        sub = subject,
-        pub = userPublicKey,
-        exp = unixTime,
-        uid = Base64.GenerateToken(),
-        type,
-        roles,
-        eas = false
-    });
-
-    var header = Base64.Base64UrlEncode(headerJson);
-    var payload = Base64.Base64UrlEncode(payloadJson);
-
-    var signature = KeysManagement.SignMessage(userPrivateKey, $"{header}.{payload}");
-    var publicToken = $"{header}.{payload}.{Base64.Base64UrlEncode(Convert.FromBase64String(signature))}";
-
-    // --- Création du JWT privé ---
-    var privatePayloadJson = JsonSerializer.SerializeToUtf8Bytes(new
-    {
-        sub = subject,
-        pub = userPublicKey,
-        exp = unixTime,
-        uid = Base64.GenerateToken(),
-        type,
-        roles,
-        eas = true
-    });
-
-    var privatePayload = Base64.Base64UrlEncode(privatePayloadJson);
-    var privateSignature = KeysManagement.SignMessage(userPrivateKey, $"{header}.{privatePayload}");
-    var privateToken = $"{header}.{privatePayload}.{Base64.Base64UrlEncode(Convert.FromBase64String(privateSignature))}";
-
-    logger.LogInformation(
-        "Generated certificate for {} {} (expiration: {}s)",
-        type,
-        subject,
-        unixTime
-    );
-
-    return new CertificatePackage(publicToken, privateToken, userPrivateKey);
-}
     
-
-    public static CertificateEntity? ValidateCertificate(string token, bool eastoken = false)
+    public static CertificatePackage GenerateCertificate(object entity, long unixTime)
     {
-        try
+        string subject;
+        string[] roles;
+        EntityType type;
+        
+        switch (entity)
         {
-            var parts = token.Split('.');
-            if (parts.Length != 3) return null;
+            case UserEntity user:
+                subject = user.Username;
+                roles = user.Authorizations.ToArray();
+                type = EntityType.User;
+                break;
 
-            if (!KeysManagement.VerifySignature(publicKey, $"{parts[0]}.{parts[1]}", parts[2]))
-                return null;
+            case NodeContract node:
+                subject = node.Name;
+                roles = node.Authorization.ToArray();
+                type = EntityType.Node;
+                break;
 
-            var cert = CertificateUtil.ParseTokenPayload(token);
-            if (cert == null) return null;
-
-            if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() > cert.Expiration)
-                return null;
-
-            if (eastoken && !cert.AuthorityToken)
-            {
-                return null;
-            }
-            
-            return cert;
+            default:
+                throw new ArgumentException("Entity type not supported for certificate generation");
         }
-        catch
-        {
-            return null;
-        }
+        
+        var (userPublicKey, userPrivateKey) = KeysManagement.GenerateKeyPair();
+
+        CertificateHeader baseHeader = new CertificateHeader();
+        baseHeader.Algorithm = "Ed25519";
+        baseHeader.Version = Version.V1;
+        
+        CertificateContent content = new();
+        content.Issuer = "EAS";
+        content.Subject = subject;
+        content.UniqueId = Base64.GenerateToken();
+        content.Expiration = unixTime;
+        content.EntityPublicKey = userPublicKey;
+        content.Authorization.Add(roles);
+        
+        CertificatePayload entPayload = new();
+        CertificateHeader entHeader = new(baseHeader);
+        entHeader.Type = Type.Entity;
+        entPayload.Header = entHeader;
+        entPayload.Content = content;
+        
+        CertificatePayload easPayload = new();
+        CertificateHeader easHeader = new(baseHeader);
+        easHeader.Type = Type.Eas;
+        easPayload.Header = easHeader;
+        easPayload.Content = content;
+
+        var entCert = CertificateUtil.SignCertificate(entPayload, privateKey, publicKey);
+        var easCert = CertificateUtil.SignCertificate(easPayload, privateKey, publicKey);
+
+        return new CertificatePackage(entCert, easCert, userPrivateKey);
     }
+    
 
     public static string GetCertificate(IHttpContext context)
     {
