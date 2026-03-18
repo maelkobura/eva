@@ -21,7 +21,6 @@ public class AuthentificationMiddleware : WebModuleBase{
     {
         try
         {
-            Console.WriteLine(ctx.RequestedPath);
             if (Configuration.Content["debug:authentification:skip"] == "true")
             {
 
