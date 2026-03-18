@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using EmbedIO;
+using Eva.AuthorityServer.Security;
 using Eva.AuthorityServer.Security.Certificate;
 using Eva.AuthorityServer.System;
 using Eva.Commons.Security.Certificate;
@@ -21,16 +22,17 @@ public class AuthentificationMiddleware : WebModuleBase{
         try
         {
             Console.WriteLine(ctx.RequestedPath);
-            if (Configuration.Content["debug:authentification:skip"] == "true") {
-                
-                ctx.Items["certificate"] = new CertificateEntity("debug.user", "EVA", CertificateType.User, new string[] { "*" }, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600, true);
-                
+            if (Configuration.Content["debug:authentification:skip"] == "true")
+            {
+
+                ctx.Items["certificate"] = null; //TODO Create a real debug cert
+
             } else if (_excludedPaths.Any(p => ctx.RequestedPath.StartsWith(p, StringComparison.OrdinalIgnoreCase))) {
                 
             } else {
                 var certRaw = CertificateManager.GetCertificate(ctx);
-                var cert = CertificateManager.ValidateCertificate(certRaw, true);
-                if (cert == null)
+                var cert = CertificateUtil.ParseCertificateBase64(certRaw);
+                if (!CertificateUtil.CheckCertificate(cert, KeysManager.PublicKeyBase64))
                 {
                     throw new Exception("Invalid token or expirated");
                 }
@@ -41,6 +43,7 @@ public class AuthentificationMiddleware : WebModuleBase{
         }
         catch (Exception e)
         {
+            Console.Error.WriteLine(e);
             ctx.Response.StatusCode = 403;
             await ctx.SendStringAsync(
                 JsonConvert.SerializeObject(new { code = 403, message = e.Message }),
