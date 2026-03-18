@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User", "Services\User\User.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Commons", "Tests\Tests.Commons\Tests.Commons.csproj", "{C2DBA471-7AD3-4A73-A0A9-FF810626B6FA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EvaEngine", "Services\EvaEngine\EvaEngine.csproj", "{4F67B902-697E-4BBC-8461-2E892D507C47}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +48,10 @@ Global
 		{C2DBA471-7AD3-4A73-A0A9-FF810626B6FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2DBA471-7AD3-4A73-A0A9-FF810626B6FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2DBA471-7AD3-4A73-A0A9-FF810626B6FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F67B902-697E-4BBC-8461-2E892D507C47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F67B902-697E-4BBC-8461-2E892D507C47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F67B902-697E-4BBC-8461-2E892D507C47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F67B902-697E-4BBC-8461-2E892D507C47}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7C36EB99-FB95-407E-A66F-A057DC7F4161} = {4286746C-AAFE-4AF8-9A74-C65207C90C7A}
