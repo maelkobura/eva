@@ -1,0 +1,47 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Eva.Commons.Security.Certificate";
+
+enum Version {
+  VERSION_UNKNOWN = 0;
+  V1 = 1;  // valeur fixe
+}
+
+enum Type {
+  TYPE_UNKNOWN = 0;
+  EAS = 1;
+  NODE_TRUST = 2;
+  ENTITY = 3;
+}
+
+enum EntityType {
+  ENTITY_UNKNOWN = 0;
+  NODE = 1;
+  USER = 2;
+}
+
+message CertificateHeader {
+  Version version = 1;
+  string algorithm = 2;
+  Type type = 3;
+}
+
+message CertificateContent {
+  string issuer = 1;
+  string subject = 2;
+  string unique_id = 3;
+  repeated string authorization = 4;
+  int64 expiration = 5;
+  string entity_public_key = 6;
+  string signature_public_key = 7;
+}
+
+message CertificatePayload {
+  CertificateHeader header = 1;
+  CertificateContent content = 2;
+}
+
+message Certificate {
+  CertificatePayload payload = 1;
+  string signature = 2;
+}
