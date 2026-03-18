@@ -105,7 +105,7 @@ public class NodeRegistry
     {
         var contract = GetContractByName(name);
         if(contract == null) throw new Exception("Node contract not found");
-        if(contract.token != token) throw new Exception("Node contract doesn't match");
+        if(contract.Token != token) throw new Exception("Node contract doesn't match");
         return contract;
     }
 }
