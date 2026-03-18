@@ -76,13 +76,13 @@ public class NodeRegistry
         NodeContracts.Add(contract);
     }
 
-    public void CreateContract(string Name, string[] Authorization)
+    public void CreateContract(string Name, string[] Authorization, string host, int port)
     {
         string file = Path.Combine(NodeDir, $"{Name}.node");
         
         string token = Base64.GenerateToken();
         
-        NodeContract contract = new NodeContract(Name, Authorization, token);
+        NodeContract contract = new NodeContract(Name, Authorization, token, host, port);
         if (NodeContracts.Select(c => c.Name).Contains(Name) ||
            File.Exists(file))
         {

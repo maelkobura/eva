@@ -19,7 +19,7 @@ public class NodeManagerController : WebApiController {
     [Route(HttpVerbs.Post,"/")]
     public async Task<Object> AddNode()
     {
-        if (!HttpContext.GetItem<CertificateEntity>("certificate").Authorization.Contains("*")) //TODO: Make integration with perms "admin.node.register"
+        if (!HttpContext.GetItem<Certificate>("certificate").Payload.Content.Authorization.Contains("*")) //TODO: Make integration with perms "admin.node.register"
         {
             HttpContext.Response.StatusCode = 401;
             return new {code = 401, message = "Unauthorized"};
@@ -29,16 +29,18 @@ public class NodeManagerController : WebApiController {
         
         string? name = (string)obj["name"];
         string[]? auth = obj["authorization"]?.ToObject<string[]>();
+        string? host = (string)obj["host"];
+        int? port = (int)obj["port"];
         
         // TODO: Check if user have same permission than register request
 
         try
         {
-            if (name == null || auth == null)
+            if (name == null || auth == null || host == null || port == null)
             {
                 throw new Exception("Invalid request");
             }
-            NodeRegistry.Instance?.CreateContract(name, auth);
+            NodeRegistry.Instance?.CreateContract(name, auth, host, (int)port);
         }catch(Exception e)
         {
             HttpContext.Response.StatusCode = 500;
