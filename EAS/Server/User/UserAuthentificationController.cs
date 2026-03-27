@@ -26,14 +26,15 @@ public class UserAuthentificationController : WebApiController {
 
         string username = (string)obj["username"];
         string code = (string)obj["code"];
+        string publicKey = (string)obj["publickey"];
 
         try
         {
             var user = UserAuthenticator.Login(username, code);
-            var cert = CertificateManager.GenerateCertificate(user, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600);
+            var cert = CertificateManager.GenerateCertificate(user, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600, publicKey);
             
             HttpContext.Response.StatusCode = 200;
-            return new {code=200, cert=cert.EntityCertificateUnit.ToByteString().ToBase64(), eas=cert.AuthorityCertificateUnit.ToByteString().ToBase64(), prv=cert.PrivateKey, pub=KeysManager.PublicKeyBase64};
+            return new {code=200, cert=cert.EntityCertificateUnit.ToByteString().ToBase64(), eas=cert.AuthorityCertificateUnit.ToByteString().ToBase64(), pub=KeysManager.PublicKeyBase64};
         }
         catch (Exception e)
         {

@@ -22,14 +22,15 @@ public class NodeAuthentificationController : WebApiController{
 
         string serviceName = (string)obj["service"];
         string token = (string)obj["token"];
+        string publicKey = (string)obj["publickey"];
 
         try
         {
             var nodeContract = NodeRegistry.Instance.GetContractByNameAndValidate(serviceName, token);
-            var cert = CertificateManager.GenerateCertificate(nodeContract, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600);
+            var cert = CertificateManager.GenerateCertificate(nodeContract, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600, publicKey);
             
             HttpContext.Response.StatusCode = 200;
-            return new {code=200, cert=cert.EntityCertificateUnit.ToByteString().ToBase64(), eas=cert.AuthorityCertificateUnit.ToByteString().ToBase64(), prv=cert.PrivateKey, pub=KeysManager.PublicKeyBase64};
+            return new {code=200, cert=cert.EntityCertificateUnit.ToByteString().ToBase64(), eas=cert.AuthorityCertificateUnit.ToByteString().ToBase64(), pub=KeysManager.PublicKeyBase64};
         }
         catch (Exception e)
         {

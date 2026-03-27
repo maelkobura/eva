@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json.Nodes;
+using Eva.Commons.Security;
 using Eva.Commons.Security.Certificate;
 using Eva.Commons.Util;
 using Microsoft.Extensions.Logging;
@@ -44,13 +45,15 @@ public class CertificateManager
             logger.LogInformation("Refreshing node certificate...");
         }
 
-        string json = JsonConvert.SerializeObject(new { service = serviceName, token });
+        var (userPrivateKey, userPublicKey) = KeysManagement.GenerateKeyPair();
+        
+        string json = JsonConvert.SerializeObject(new { service = serviceName, token, publickey = userPublicKey });
         HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
         var response = AuthorityClient.Instance!.SendPostRequest("/node/auth", content).Result;
         response.EnsureSuccessStatusCode();
         var responseJson = JObject.Parse(response.Content.ReadAsStringAsync().Result) ?? throw new Exception("EAS response is empty");
         CertificateRaw = (string)responseJson["cert"]! ?? throw new Exception("Certificate not found in response");
-        PrivateKey = (string)responseJson["prv"] ?? throw new Exception("Private key not found in response");
+        PrivateKey = userPrivateKey;
         EasPublicKey = (string)responseJson["pub"] ?? throw new Exception("Public key not found in response");
         
         EasCertificateRaw = (string)responseJson["eas"]! ?? throw new Exception("EAS certificate not found in response");

@@ -32,7 +32,7 @@ public class CertificateManager
         IsInitialized = true;
     }
     
-    public static CertificatePackage GenerateCertificate(object entity, long unixTime)
+    public static CertificatePackage GenerateCertificate(object entity, long unixTime, string entityPublicKey)
     {
         string subject;
         string[] roles;
@@ -52,8 +52,6 @@ public class CertificateManager
             default:
                 throw new ArgumentException("Entity type not supported for certificate generation");
         }
-        
-        var (userPrivateKey, userPublicKey) = KeysManagement.GenerateKeyPair();
 
         CertificateHeader baseHeader = new CertificateHeader();
         baseHeader.Algorithm = "Ed25519";
@@ -64,7 +62,7 @@ public class CertificateManager
         content.Subject = subject;
         content.UniqueId = Base64.GenerateToken();
         content.Expiration = unixTime;
-        content.EntityPublicKey = userPublicKey;
+        content.EntityPublicKey = entityPublicKey;
         content.Authorization.Add(roles);
         
         CertificatePayload entPayload = new();
@@ -82,7 +80,7 @@ public class CertificateManager
         var entCert = CertificateUtil.SignCertificate(entPayload, privateKey, publicKey);
         var easCert = CertificateUtil.SignCertificate(easPayload, privateKey, publicKey);
 
-        return new CertificatePackage(entCert, easCert, userPrivateKey);
+        return new CertificatePackage(entCert, easCert);
     }
     
 
