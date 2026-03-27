@@ -36,27 +36,24 @@ public class CertificateManager
     {
         string subject;
         string[] roles;
-        EntityType type;
         
         switch (entity)
         {
             case UserEntity user:
                 subject = user.Username;
                 roles = user.Authorizations.ToArray();
-                type = EntityType.User;
                 break;
 
             case NodeContract node:
                 subject = node.Name;
                 roles = node.Authorization.ToArray();
-                type = EntityType.Node;
                 break;
 
             default:
                 throw new ArgumentException("Entity type not supported for certificate generation");
         }
         
-        var (userPublicKey, userPrivateKey) = KeysManagement.GenerateKeyPair();
+        var (userPrivateKey, userPublicKey) = KeysManagement.GenerateKeyPair();
 
         CertificateHeader baseHeader = new CertificateHeader();
         baseHeader.Algorithm = "Ed25519";
