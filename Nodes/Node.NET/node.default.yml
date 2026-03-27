@@ -16,9 +16,11 @@ eas:
   main:
     host: localhost
     port: 8080
+    tls: true
   backup:
     host: localhost
     port: 8080
+    tls: true
     
 nodes:
   max-connection: 0 # 0 = infinite

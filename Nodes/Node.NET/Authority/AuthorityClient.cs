@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Eva.AuthorityServer.System;
+using Microsoft.Extensions.Configuration;
 
 namespace Eva.Node.Authority;
 
@@ -27,12 +28,12 @@ public class AuthorityClient
 
     public Uri GetMainUri()
     {
-        return new Uri($"http://{main.Host}:{main.Port}");
+        return new Uri($"http{(main.Tls ? "s" : "")}://{main.Host}:{main.Port}");
     }
     
     public Uri GetBackupUri()
     {
-        return new Uri($"http://{backup.Host}:{backup.Port}");
+        return new Uri($"http{(backup.Tls ? "s" : "")}://{backup.Host}:{backup.Port}");
     }
 
     public async Task<HttpResponseMessage> SendPostRequest(string route, HttpContent content)
