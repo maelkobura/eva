@@ -5,6 +5,8 @@ using Eva.Commons.Util;
 using Eva.Node.Authority;
 using Eva.Node.Authority.Certificate;
 using Eva.Node.Loader;
+using Eva.Node.Network;
+using Eva.Node.Network.Discover;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Mono.Options;
@@ -47,3 +49,12 @@ AuthorityClient.Init(
 
 CertificateManager.Init(Configuration.Content.GetSection("authentification:token").Get<string>());
 CertificateManager.Instance.GenerateCertificate(description.Name);
+
+NodeDiscover.Init(description);
+EntityManager.Init();
+
+NetworkManager.Init();
+NetworkManager.Instance.Start();
+NodeDiscover.Instance!.Discover();
+Console.ReadKey(true);
+
