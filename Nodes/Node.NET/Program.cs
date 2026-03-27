@@ -48,7 +48,8 @@ AuthorityClient.Init(
     Configuration.Content.GetSection("eas:backup").Get<AuthorityConnectionInfo>());
 
 CertificateManager.Init(Configuration.Content.GetSection("authentification:token").Get<string>());
-CertificateManager.Instance.GenerateCertificate(description.Name);
+CertificateManager.Instance.GenerateEvaCertificate(description.Name);
+CertificateManager.Instance.GenerateTlsCertificate();
 
 NodeDiscover.Init(description);
 EntityManager.Init();
