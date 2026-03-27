@@ -1,0 +1,36 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Eva.Commons.Messages";
+
+enum HandshakeStep {
+  INITIALIZATION = 0;
+  CHALLENGE = 1;
+  CHALLENGE_RESULT = 2;
+  VALIDATION = 3;
+}
+
+message Handshake {
+   HandshakeStep step = 1;
+   bytes payload = 2;
+}
+
+message HandshakeInitialization {
+  string certificate = 1;
+  string name = 2;
+}
+
+message HandshakeChallenge {
+  int32 FirstFactor = 2;
+  int32 SecondFactor = 3;
+}
+
+message HandshakeChallengeResult {
+  int32 Result = 1;
+  bytes Signature = 2;
+}
+
+message HandshakeValidation {
+  bool success = 1;
+  optional string node_trust_certificate = 2;
+}
+

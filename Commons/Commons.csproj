@@ -29,6 +29,7 @@
 
     <ItemGroup>
         <Protobuf Include="Security\Certificate\Certificate.proto" />
+        <Protobuf Include="Messages\*.proto" />
     </ItemGroup>
 
 </Project>
