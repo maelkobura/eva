@@ -1,4 +1,5 @@
 ﻿using System.Net.WebSockets;
+using System.Security.Cryptography.X509Certificates;
 using Eva.Commons.Messages;
 using Eva.Commons.Security;
 using Eva.Commons.Security.Certificate;
@@ -28,9 +29,23 @@ public async Task<string?> Handshake()
 
     using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10)); // timeout global
 
+    bool secure = false;
+    
+    if (CertificateManager.Instance!.TlsEasCertificate is not null)
+    {
+        ws.Options.RemoteCertificateValidationCallback = (_, cert, chain, errors) =>
+        {
+            chain!.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
+            chain.ChainPolicy.CustomTrustStore.Add(CertificateManager.Instance.TlsEasCertificate);
+            return chain.Build(new X509Certificate2(cert!));
+        };
+        secure = true;
+    }
+    
+    
     try
     {
-        var uri = new Uri("ws://" + url + "/handshake");
+        var uri = new Uri($"ws{(secure ? "s" : "")}://" + url + "/handshake");
         await ws.ConnectAsync(uri, cts.Token);
         
         if (ws.State != WebSocketState.Open)
