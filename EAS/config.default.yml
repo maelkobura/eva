@@ -7,6 +7,8 @@ logging:
 debug:
   authentification:
     skip: false
+  tls:
+    allow-loopback: true
 
 # Main configuration for PostgreSQL database management
 database:
