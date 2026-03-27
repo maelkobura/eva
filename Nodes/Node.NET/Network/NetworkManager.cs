@@ -1,6 +1,7 @@
 ﻿using EmbedIO;
 using Eva.AuthorityServer.System;
 using Eva.Commons.Util;
+using Eva.Node.Authority.Certificate;
 using Microsoft.Extensions.Logging;
 
 namespace Eva.Node.Network;
@@ -22,8 +23,9 @@ public class NetworkManager
     {
         Swan.Logging.Logger.NoLogging();
         server = new WebServer(o => o
-                .WithUrlPrefix($"http://localhost:{Configuration.Content["network:self:port"]}/")
-                .WithMode(HttpListenerMode.EmbedIO))
+                .WithUrlPrefix($"https://localhost:{Configuration.Content["network:self:port"]}/")
+                .WithMode(HttpListenerMode.EmbedIO)
+                .WithCertificate(CertificateManager.Instance.TlsNodeCertificate))
             .WithLocalSessionManager()
             .WithModule(new HandshakeRoute("/handshake", true));
     }
