@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using Eva.AuthorityServer.Nodes;
 using Eva.AuthorityServer.Security;
 using Eva.AuthorityServer.Security.Certificate;
+using Eva.AuthorityServer.Security.TLS;
 using Eva.AuthorityServer.Server;
 using Eva.AuthorityServer.System;
 using Eva.AuthorityServer.User;
@@ -56,6 +57,8 @@ class Program
         NodeRegistry.Init(nodeDir);
         //PermissionsManager
         AuthorityServerManager.Init();
+        CAManager.Init();
+        CAManager.Instance!.GenerateCA();
         
         AuthorityServerManager.Start();
         Console.ReadKey(true);
