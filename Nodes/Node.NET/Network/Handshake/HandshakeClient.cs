@@ -23,7 +23,7 @@ public class HandshakeClient
         this.name = name;
     }
     
-public async Task<string?> Handshake()
+public async Task<string?> Handshake(bool firstConnection = false)
 {
     using var ws = new ClientWebSocket();
 
@@ -55,7 +55,8 @@ public async Task<string?> Handshake()
         var initPayload = new HandshakeInitialization
         {
             Name = CertificateManager.Instance!.CertificateUnit.Payload.Content.Subject,
-            Certificate = CertificateManager.Instance.CertificateRaw
+            Certificate = CertificateManager.Instance.CertificateRaw,
+            Initialization = firstConnection
         };
 
         var init = new Handshake

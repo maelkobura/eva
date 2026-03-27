@@ -17,6 +17,7 @@ message Handshake {
 message HandshakeInitialization {
   string certificate = 1;
   string name = 2;
+  bool initialization = 3;
 }
 
 message HandshakeChallenge {

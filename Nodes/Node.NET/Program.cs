@@ -56,6 +56,6 @@ EntityManager.Init();
 
 NetworkManager.Init();
 NetworkManager.Instance.Start();
-NodeDiscover.Instance!.Discover();
+NodeDiscover.Instance!.Discover(true);
 Console.ReadKey(true);
 

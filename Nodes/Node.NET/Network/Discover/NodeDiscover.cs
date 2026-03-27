@@ -26,7 +26,7 @@ public class NodeDiscover
         this.Self = self;
     }
 
-    public void Discover()
+    public void Discover(bool firstConnection = false)
     {
         logger.LogInformation("Discovering nodes...");
         var nodesDiscovered = GetNodesFromTracker();
@@ -42,12 +42,12 @@ public class NodeDiscover
 
         foreach (var node in EntityManager.Instance!.Nodes)
         {
-            Authenticate(node.Name);
+            Authenticate(node.Name, firstConnection);
         }
         
     }
 
-    public void Authenticate(string name)
+    public void Authenticate(string name, bool firstConnection = false)
     {
         var node = EntityManager.Instance!.Nodes.FirstOrDefault(entity => entity.Name == name);
         if (node == null) throw new Exception("Node not found: " + name);
@@ -56,7 +56,7 @@ public class NodeDiscover
         logger.LogInformation("Try to authenticate to node {0}...", name);
 
         var handshakeClient = new HandshakeClient(node.Address, node.Name);
-        handshakeClient.Handshake().ContinueWith(task =>
+        handshakeClient.Handshake(firstConnection).ContinueWith(task =>
         {
             if(!string.IsNullOrEmpty(task.Result) && task.IsCompletedSuccessfully){
                 logger.LogInformation("Authenticated to node {0}", node.Name);

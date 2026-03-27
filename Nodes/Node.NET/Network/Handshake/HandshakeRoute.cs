@@ -47,7 +47,7 @@ public class HandshakeRoute : WebSocketModule
             return;
         }
 
-        StoreSession(context, certificate, initPayload.Name);
+        StoreSession(context, certificate, initPayload.Name, initPayload.Initialization);
 
         var challenge = new HandshakeChallenge
         {
@@ -82,13 +82,19 @@ public class HandshakeRoute : WebSocketModule
         await SendValidationAsync(context, success: true, nodeTrustCert);
         await context.WebSocket.CloseAsync();
 
+        if ((bool)context.Session["first"])
+        {
+            EntityManager.Instance!.ResetCertificateForNode(GetSessionName(context));
+        }
+        
         NodeDiscover.Instance!.Authenticate(GetSessionName(context));
     }
 
-    private static void StoreSession(IWebSocketContext context, Certificate certificate, string name)
+    private static void StoreSession(IWebSocketContext context, Certificate certificate, string name, bool firstConnection)
     {
         context.Session["certificate"] = certificate;
         context.Session["name"]        = name;
+        context.Session["first"] = firstConnection;
     }
 
     private static Certificate GetSessionCertificate(IWebSocketContext context)
