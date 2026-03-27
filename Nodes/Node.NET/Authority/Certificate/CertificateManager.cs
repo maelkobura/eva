@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Text.Json.Nodes;
 using Eva.Commons.Security;
 using Eva.Commons.Security.Certificate;
@@ -28,13 +29,15 @@ public class CertificateManager
     public Commons.Security.Certificate.Certificate EasCertificateUnit{ get; private set; }
     public string PrivateKey{ get; private set; }
     public string EasPublicKey{ get; private set; }
+    public X509Certificate2? TlsNodeCertificate{ get; private set; }
+    public X509Certificate2? TlsEasCertificate{ get; private set; }
     
     private CertificateManager(string token)
     {
         this.token = token;
     }
     
-    public void GenerateCertificate(string serviceName)
+    public void GenerateEvaCertificate(string serviceName)
     {
         if (CertificateRaw == null)
         {
@@ -63,6 +66,27 @@ public class CertificateManager
         CertificateUnit = CertificateUtil.ParseCertificateBase64(CertificateRaw) ?? throw new Exception("Certificate parsing failed");
 
         logger.LogInformation("Successfully created certificate.");
+    }
+    
+    public void GenerateTlsCertificate()
+    {
+        if (TlsNodeCertificate == null)
+        {
+            logger.LogInformation("Creating TLS certificate...");
+        }
+        else
+        {
+            logger.LogInformation("Refreshing TLS certificate...");
+        }
+        
+        var response = AuthorityClient.Instance!.SendGetRequest("/node/auth/tls").Result;
+        response.EnsureSuccessStatusCode();
+        var responseJson = JObject.Parse(response.Content.ReadAsStringAsync().Result) ?? throw new Exception("EAS response is empty");
+        
+        TlsNodeCertificate = new X509Certificate2(Convert.FromBase64String((string)responseJson["nodeCert"]! ?? throw new Exception("Node TLS certificate not found in response")));
+        TlsEasCertificate = new X509Certificate2(Convert.FromBase64String((string)responseJson["easCert"]! ?? throw new Exception("EAS TLS certificate not found in response")));
+        
+        logger.LogInformation("Successfully created TLS certificate.");
     }
     
 }
