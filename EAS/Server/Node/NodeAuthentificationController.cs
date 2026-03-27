@@ -1,10 +1,13 @@
-﻿using EmbedIO;
+﻿using System.Security.Cryptography.X509Certificates;
+using EmbedIO;
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
 using Eva.AuthorityServer.Nodes;
 using Eva.AuthorityServer.Security;
 using Eva.AuthorityServer.Security.Certificate;
+using Eva.AuthorityServer.Security.TLS;
 using Eva.AuthorityServer.User;
+using Eva.Commons.Security.Certificate;
 using Google.Protobuf;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -38,4 +41,33 @@ public class NodeAuthentificationController : WebApiController{
             return new {code = 403, message = e.Message};
         }
     }
+
+    [Route(HttpVerbs.Get, "/tls")]
+    public async Task<Object> GenerateTLSCert()
+    {
+        try
+        {
+            var body = CertificateManager.GetCertificate(HttpContext);
+            var cert = CertificateUtil.ParseCertificateBase64(body);
+            if (!CertificateUtil.CheckCertificate(cert, KeysManager.PublicKeyBase64))
+            {
+                throw new Exception("Invalid token or expirated");
+            }
+
+            var contract = NodeRegistry.Instance!.GetContractByName(cert!.Payload.Content.Subject);
+            
+            
+            
+            var nodeCert = CAManager.Instance!.IssueNodeCertificate(contract.Host);
+            
+            HttpContext.Response.StatusCode = 200;
+            return new {code=200,nodeCert=Convert.ToBase64String(nodeCert.Export(X509ContentType.Pfx)),easCert=Convert.ToBase64String(CAManager.Instance.CA!.Export(X509ContentType.Cert))};
+        }
+        catch (Exception e)
+        {
+            HttpContext.Response.StatusCode = 403;
+            return new {code = 403, message = e.Message};
+        }
+    }
+    
 }
