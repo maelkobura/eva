@@ -8,6 +8,10 @@ logging:
 authentification:
   token: "no token"
   
+network:
+  self:
+    port: 8080
+  
 eas:
   main:
     host: localhost
