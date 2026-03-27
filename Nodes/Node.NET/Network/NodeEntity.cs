@@ -23,4 +23,9 @@ public class NodeEntity {
     {
         return NodeTrustCertificate == null || NodeTrustCertificate.Payload.Content.Expiration < DateTimeOffset.UtcNow.ToUnixTimeSeconds();
     }
+    
+    public void ResetCertificate()
+    {
+        NodeTrustCertificate = null;
+    }
 }

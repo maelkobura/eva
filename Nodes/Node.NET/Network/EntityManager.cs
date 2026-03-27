@@ -15,6 +15,11 @@ public class EntityManager
         if (Instance != null) return;
         Instance = new EntityManager();
     }
+    
+    public void ResetCertificateForNode(string nodeName)
+    {
+        Nodes.First(entity => entity.Name == nodeName).ResetCertificate();
+    }
 
     
 }
