@@ -21,11 +21,12 @@ public class CertificateManager
     }
 
     private readonly string token;
-    private string certificateRaw;
-    private string easCertificateRaw;
-    private Commons.Security.Certificate.Certificate _certificateUnit;
-    private Commons.Security.Certificate.Certificate _easCertificateUnit;
-    private string PrivateKey;
+    public string CertificateRaw { get; private set; }
+    public string EasCertificateRaw{ get; private set; }
+    public Commons.Security.Certificate.Certificate CertificateUnit{ get; private set; }
+    public Commons.Security.Certificate.Certificate EasCertificateUnit{ get; private set; }
+    public string PrivateKey{ get; private set; }
+    public string EasPublicKey{ get; private set; }
     
     private CertificateManager(string token)
     {
@@ -34,7 +35,7 @@ public class CertificateManager
     
     public void GenerateCertificate(string serviceName)
     {
-        if (certificateRaw == null)
+        if (CertificateRaw == null)
         {
             logger.LogInformation("Creating node certificate...");
         }
@@ -48,14 +49,15 @@ public class CertificateManager
         var response = AuthorityClient.Instance!.SendPostRequest("/node/auth", content).Result;
         response.EnsureSuccessStatusCode();
         var responseJson = JObject.Parse(response.Content.ReadAsStringAsync().Result) ?? throw new Exception("EAS response is empty");
-        certificateRaw = (string)responseJson["cert"]! ?? throw new Exception("Certificate not found in response");
+        CertificateRaw = (string)responseJson["cert"]! ?? throw new Exception("Certificate not found in response");
         PrivateKey = (string)responseJson["prv"] ?? throw new Exception("Private key not found in response");
+        EasPublicKey = (string)responseJson["pub"] ?? throw new Exception("Public key not found in response");
         
-        easCertificateRaw = (string)responseJson["eas"]! ?? throw new Exception("EAS certificate not found in response");
-        _easCertificateUnit = CertificateUtil.ParseCertificateBase64(easCertificateRaw) ?? throw new Exception("EAS certificate parsing failed");
-        AuthorityClient.Instance.EasCertificate = easCertificateRaw;
+        EasCertificateRaw = (string)responseJson["eas"]! ?? throw new Exception("EAS certificate not found in response");
+        EasCertificateUnit = CertificateUtil.ParseCertificateBase64(EasCertificateRaw) ?? throw new Exception("EAS certificate parsing failed");
+        AuthorityClient.Instance.EasCertificate = EasCertificateRaw;
         
-        _certificateUnit = CertificateUtil.ParseCertificateBase64(certificateRaw) ?? throw new Exception("Certificate parsing failed");
+        CertificateUnit = CertificateUtil.ParseCertificateBase64(CertificateRaw) ?? throw new Exception("Certificate parsing failed");
 
         logger.LogInformation("Successfully created certificate.");
     }
