@@ -26,7 +26,7 @@ public class UserAuthentificationController : WebApiController {
 
         string username = (string)obj["username"];
         string code = (string)obj["code"];
-        string publicKey = (string)obj["publickey"];
+        string publicKey = (string)obj["pub"];
 
         try
         {
