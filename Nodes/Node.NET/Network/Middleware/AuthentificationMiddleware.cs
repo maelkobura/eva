@@ -5,6 +5,7 @@ using Eva.Commons.Security.Certificate;
 using Eva.Commons.Util;
 using Eva.Node.Authority.Certificate;
 using Newtonsoft.Json;
+using Type = Eva.Commons.Security.Certificate.Type;
 
 namespace Eva.Node.Network.Middleware;
 
@@ -30,7 +31,7 @@ public class AuthentificationMiddleware : WebModuleBase{
             } else {
                 var certRaw = ConnectionUtil.GetCertificate(ctx);
                 var cert = CertificateUtil.ParseCertificateBase64(certRaw);
-                if (!CertificateUtil.CheckCertificate(cert, CertificateManager.Instance!.EasPublicKey))
+                if (cert.Payload.Header.Type == Type.NodeTrust && !CertificateUtil.CheckCertificate(cert, CertificateManager.Instance!.CertificateUnit.Payload.Content.EntityPublicKey))
                 {
                     throw new Exception("Invalid token or expirated");
                 }
