@@ -1,0 +1,50 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Eva.Commons.Messages";
+
+message ParameterDescriptor {
+  string name = 1;
+  string type = 2;        // nom du type C# sérialisé en string ex: "System.Int32"
+  bool is_required = 3;
+}
+
+enum EvaType {
+  OBJECT = 0;
+  STRING = 1;
+  INT32 = 2;
+  INT64 = 3;
+  BOOLEAN = 4;
+  ARRAY = 5;
+  FLOAT = 6;
+  DOUBLE = 7;
+  BYTES = 8;
+  TIMESTAMP = 9;
+}
+
+message ReturnType {
+  EvaType type = 1;
+  optional EvaType array_type = 2;
+  optional string object_name = 3;
+}
+
+message FunctionDescriptor {
+  string id = 1;          // Guid généré côté serveur au moment de la sérialisation
+  string name = 2;
+  string description = 3;
+  repeated string keywords = 4;
+  repeated string authorization = 5;
+  repeated ParameterDescriptor parameters = 6;
+  ReturnType return_type = 7; // idem, nom du type C# en string
+}
+
+message FunctionList {
+  string service_id = 1;
+  string version = 2;
+  repeated FunctionDescriptor functions = 3;
+}
+
+message FunctionPanel {
+  string service_id = 1;
+  repeated FunctionDescriptor functions = 2;
+  repeated FunctionPanel sub_services = 3;
+}
