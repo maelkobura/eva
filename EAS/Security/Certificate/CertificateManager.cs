@@ -36,17 +36,20 @@ public class CertificateManager
     {
         string subject;
         string[] roles;
+        EntityType entityType;
         
         switch (entity)
         {
             case UserEntity user:
                 subject = user.Username;
                 roles = user.Authorizations.ToArray();
+                entityType = EntityType.User;
                 break;
 
             case NodeContract node:
                 subject = node.Name;
                 roles = node.Authorization.ToArray();
+                entityType = EntityType.Node;
                 break;
 
             default:
@@ -60,6 +63,7 @@ public class CertificateManager
         CertificateContent content = new();
         content.Issuer = "EAS";
         content.Subject = subject;
+        content.EntityType = entityType;
         content.UniqueId = Base64.GenerateToken();
         content.Expiration = unixTime;
         content.EntityPublicKey = entityPublicKey;
