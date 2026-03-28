@@ -49,11 +49,29 @@ public class EvaFormatConsoleFormatter : ConsoleFormatter
         TextWriter textWriter)
     {
         string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-        string level = logEntry.LogLevel.ToString().PadRight(5); // Ex: INFO 
-        string category = TruncateCategory(logEntry.Category); // ex: c.e.MyClass
+        string level = logEntry.LogLevel.ToString().PadRight(5);
+        string category = TruncateCategory(logEntry.Category);
         string msg = logEntry.Formatter(logEntry.State, logEntry.Exception);
 
-        textWriter.WriteLine($"{timestamp}  {level} [{AppName}] {category} - {msg}");
+        string line = $"{timestamp}  {level} [{AppName}] {category} - {msg}";
+
+        ConsoleColor? color = logEntry.LogLevel switch
+        {
+            LogLevel.Error or LogLevel.Critical => ConsoleColor.Red,
+            LogLevel.Warning                    => ConsoleColor.Yellow,
+            _                                   => null
+        };
+
+        if (color.HasValue)
+        {
+            Console.ForegroundColor = color.Value;
+            Console.WriteLine(line);
+            Console.ResetColor();
+        }
+        else
+        {
+            textWriter.WriteLine(line);
+        }
     }
     
     private string TruncateCategory(string fullCategory)
