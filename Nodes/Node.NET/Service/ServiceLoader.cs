@@ -1,5 +1,7 @@
-﻿using Eva.Commons.Util;
+﻿using System.Reflection;
+using Eva.Commons.Util;
 using Eva.Node.Loader;
+using Eva.Node.Service.Functions;
 using Microsoft.Extensions.Logging;
 
 namespace Eva.Node.Service;
@@ -27,6 +29,17 @@ public class ServiceLoader
         service = (EvaService)Activator.CreateInstance(type);
         
         if(service is null) throw new Exception("Unable to load service");
+        
+        var methods = service.GetType()
+            .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            .Where(m => m.GetCustomAttribute<EvaFunctionAttribute>() is not null);
+
+        foreach (var method in methods)
+        {
+            var attr = method.GetCustomAttribute<EvaFunctionAttribute>()!;
+            FunctionRegistry.Instance!.RegisterObjectMethod(service, method, attr);
+        }
+        
         
         //TODO Autowired params fill
         service.Initialize();
