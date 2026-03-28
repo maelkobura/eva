@@ -8,6 +8,7 @@ public class AssemblyLoader
     public static AssemblyLoader? Instance { get; private set; }
     
     private Assembly? assembly;
+    private ServiceDescription? serviceDescription;
     public string NodeAssemblyPath { get; }
 
     public static void Init(string nodeAssemblyPath)
@@ -24,6 +25,7 @@ public class AssemblyLoader
 
     public ServiceDescription LoadDescription()
     {
+        if(serviceDescription is not null) return serviceDescription;
         if(assembly == null) throw new Exception("Assembly not loaded");
         var metadata = assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
             .ToDictionary(a => a.Key, a => a.Value);
@@ -41,7 +43,7 @@ public class AssemblyLoader
             }
         }
 
-        return new ServiceDescription(
+        return serviceDescription = new ServiceDescription(
             Name: metadata.GetValueOrDefault("Name") ?? "",
             Authorization: authorization,
             Class: metadata.GetValueOrDefault("Class") ?? "",
@@ -51,6 +53,13 @@ public class AssemblyLoader
             Author: metadata.GetValueOrDefault("Author") ?? "No author",
             License: metadata.GetValueOrDefault("License") ?? "No license"
         );
+    }
+
+    public Type GetMainType()
+    {
+        if(assembly == null) throw new Exception("Assembly not loaded");
+        if(serviceDescription is null) throw new Exception("Service description not loaded");
+        return assembly.GetType(serviceDescription.Class);
     }
     
 }
