@@ -1,8 +1,8 @@
 import asyncio
 
-from Utilities.NodeTrustGenerator.handshake import handshake
-from Utilities.UtilCommonsPython.auth import authentification
-from Utilities.UtilCommonsPython.keys import generate_ed25519_keypair_base64
+from NodeTrustGenerator.handshake import handshake
+from UtilCommonsPython.auth import authentification
+from UtilCommonsPython.keys import generate_ed25519_keypair_base64
 
 eas_address = "http://localhost:8080/"
 
