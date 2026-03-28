@@ -12,6 +12,8 @@ public class ServiceLoader
     private static ILogger logger = EvaLogger.CreateLogger<ServiceLoader>();
     private EvaService? service;
     
+    public string ServiceId => service?.GetType().Name ?? throw new Exception("Service not loaded");
+    
     public static void Init()
     {
         if (Instance != null) return;
