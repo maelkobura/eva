@@ -34,6 +34,7 @@ message CertificateContent {
   int64 expiration = 5;
   string entity_public_key = 6;
   string signature_public_key = 7;
+  EntityType entity_type = 8;
 }
 
 message CertificatePayload {

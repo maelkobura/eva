@@ -51,8 +51,8 @@ public class HandshakeRoute : WebSocketModule
 
         var challenge = new HandshakeChallenge
         {
-            FirstFactor  = RandomNumberGenerator.GetInt32(-999999, 999999),
-            SecondFactor = RandomNumberGenerator.GetInt32(-99999,  99999)
+            FirstFactor  = RandomNumberGenerator.GetInt32(-46340, 46340),
+            SecondFactor = RandomNumberGenerator.GetInt32(-46340, 46340)
         };
 
         context.Session["challenge"] = challenge.FirstFactor * challenge.SecondFactor;
@@ -82,6 +82,8 @@ public class HandshakeRoute : WebSocketModule
         await SendValidationAsync(context, success: true, nodeTrustCert);
         await context.WebSocket.CloseAsync();
 
+        if (certificate.Payload.Content.EntityType == EntityType.User) return;
+        
         if ((bool)context.Session["first"])
         {
             EntityManager.Instance!.ResetCertificateForNode(GetSessionName(context));
