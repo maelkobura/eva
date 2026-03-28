@@ -13,7 +13,21 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Nodes\Node.NET\Node.NET.csproj" />
+        <ProjectReference Include="..\..\Nodes\Node.NET\Node.NET.csproj"
+                          ReferenceOutputAssembly="true"
+                          Private="false"
+                          ExcludeAssets="runtime" />
     </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Commons\Commons.csproj"
+                          ReferenceOutputAssembly="true"
+                          Private="false"
+                          ExcludeAssets="runtime" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
+    </PropertyGroup>
 
 </Project>
