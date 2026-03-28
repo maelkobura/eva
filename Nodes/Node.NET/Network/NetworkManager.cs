@@ -21,11 +21,19 @@ public class NetworkManager
 
     public NetworkManager()
     {
+        
+        bool enableTls = Configuration.Content["debug:skip-tls"] != "true";
+        
+        if(!enableTls)
+        {
+            logger.LogWarning("TLS Server is disabled. Be careful to activate in production environment");
+        }
+        
         Swan.Logging.Logger.NoLogging();
         server = new WebServer(o => o
-                .WithUrlPrefix($"http{(Configuration.Content["debug:skip-tls"]=="true" ? "" : "s")}://localhost:{Configuration.Content["network:self:port"]}/")
+                .WithUrlPrefix($"http{(!enableTls ? "" : "s")}://localhost:{Configuration.Content["network:self:port"]}/")
                 .WithMode(HttpListenerMode.EmbedIO)
-                .WithCertificate(Configuration.Content["debug:skip-tls"]=="true" ? null : CertificateManager.Instance.TlsNodeCertificate))
+                .WithCertificate(!enableTls ? null : CertificateManager.Instance.TlsNodeCertificate))
             .WithLocalSessionManager()
             .WithModule(new HandshakeRoute("/handshake", true));
     }
