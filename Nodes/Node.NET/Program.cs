@@ -8,6 +8,7 @@ using Eva.Node.Loader;
 using Eva.Node.Network;
 using Eva.Node.Network.Discover;
 using Eva.Node.Service;
+using Eva.Node.Service.Functions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Mono.Options;
@@ -58,6 +59,8 @@ EntityManager.Init();
 NetworkManager.Init();
 NetworkManager.Instance.Start();
 NodeDiscover.Instance!.Discover(true);
+
+FunctionRegistry.Init();
 
 ServiceLoader.Init();
 ServiceLoader.Instance!.LoadService();

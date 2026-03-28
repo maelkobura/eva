@@ -1,0 +1,20 @@
+﻿using System.Text;
+
+namespace Eva.Commons.Util;
+
+public static class StringExtensions
+{
+    public static string ToSnakeCase(this string str)
+    {
+        if (string.IsNullOrEmpty(str)) return str;
+
+        var sb = new StringBuilder();
+        for (int i = 0; i < str.Length; i++)
+        {
+            if (char.IsUpper(str[i]) && i > 0)
+                sb.Append('_');
+            sb.Append(char.ToLower(str[i]));
+        }
+        return sb.ToString();
+    }
+}
