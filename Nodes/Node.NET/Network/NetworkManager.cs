@@ -23,9 +23,9 @@ public class NetworkManager
     {
         Swan.Logging.Logger.NoLogging();
         server = new WebServer(o => o
-                .WithUrlPrefix($"https://localhost:{Configuration.Content["network:self:port"]}/")
+                .WithUrlPrefix($"http{(Configuration.Content["debug:skip-tls"]=="true" ? "" : "s")}://localhost:{Configuration.Content["network:self:port"]}/")
                 .WithMode(HttpListenerMode.EmbedIO)
-                .WithCertificate(CertificateManager.Instance.TlsNodeCertificate))
+                .WithCertificate(Configuration.Content["debug:skip-tls"]=="true" ? null : CertificateManager.Instance.TlsNodeCertificate))
             .WithLocalSessionManager()
             .WithModule(new HandshakeRoute("/handshake", true));
     }
