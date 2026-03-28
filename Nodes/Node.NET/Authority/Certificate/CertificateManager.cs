@@ -1,6 +1,7 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json.Nodes;
+using Eva.AuthorityServer.System;
 using Eva.Commons.Security;
 using Eva.Commons.Security.Certificate;
 using Eva.Commons.Util;
@@ -70,6 +71,8 @@ public class CertificateManager
     
     public void GenerateTlsCertificate()
     {
+        if(Configuration.Content["debug:skip-tls"]=="true") return;
+        
         if (TlsNodeCertificate == null)
         {
             logger.LogInformation("Creating TLS certificate...");

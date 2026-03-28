@@ -5,6 +5,9 @@ platform: .NET
 logging:
   level: Information
   
+debug:
+  skip-tls: false
+  
 authentification:
   token: "no token"
   
