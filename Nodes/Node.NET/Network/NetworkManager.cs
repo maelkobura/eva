@@ -2,6 +2,7 @@
 using Eva.AuthorityServer.System;
 using Eva.Commons.Util;
 using Eva.Node.Authority.Certificate;
+using Eva.Node.Network.Middleware;
 using Microsoft.Extensions.Logging;
 
 namespace Eva.Node.Network;
@@ -35,6 +36,7 @@ public class NetworkManager
                 .WithMode(HttpListenerMode.EmbedIO)
                 .WithCertificate(!enableTls ? null : CertificateManager.Instance.TlsNodeCertificate))
             .WithLocalSessionManager()
+            .WithModule(new AuthentificationMiddleware("/"))
             .WithModule(new HandshakeRoute("/handshake", true));
     }
 
