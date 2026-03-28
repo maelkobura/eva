@@ -24,8 +24,8 @@ public class UserService : EvaService {
     }
 
     [EvaFunction(Description = "Get user data", Keywords = new[] { "user", "data" })]
-    public void GetUserData()
+    public string GetUserData(string username)
     {
-        //Do nothing for now
+        return "Hello" + username;
     }
 }
