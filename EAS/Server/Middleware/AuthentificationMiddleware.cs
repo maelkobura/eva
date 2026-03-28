@@ -4,6 +4,7 @@ using Eva.AuthorityServer.Security;
 using Eva.AuthorityServer.Security.Certificate;
 using Eva.AuthorityServer.System;
 using Eva.Commons.Security.Certificate;
+using Eva.Commons.Util;
 using Newtonsoft.Json;
 
 namespace Eva.AuthorityServer.Server.Middleware;
@@ -29,7 +30,7 @@ public class AuthentificationMiddleware : WebModuleBase{
             } else if (_excludedPaths.Any(p => ctx.RequestedPath.StartsWith(p, StringComparison.OrdinalIgnoreCase))) {
                 
             } else {
-                var certRaw = CertificateManager.GetCertificate(ctx);
+                var certRaw = ConnectionUtil.GetCertificate(ctx);
                 var cert = CertificateUtil.ParseCertificateBase64(certRaw);
                 if (!CertificateUtil.CheckCertificate(cert, KeysManager.PublicKeyBase64))
                 {

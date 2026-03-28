@@ -7,6 +7,7 @@ using Eva.AuthorityServer.Security;
 using Eva.AuthorityServer.Security.Certificate;
 using Eva.AuthorityServer.User;
 using Eva.Commons.Security.Certificate;
+using Eva.Commons.Util;
 using Google.Protobuf;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -48,7 +49,7 @@ public class UserAuthentificationController : WebApiController {
     {
         try
         {
-            var body = CertificateManager.GetCertificate(HttpContext);
+            var body = ConnectionUtil.GetCertificate(HttpContext);
             var cert = CertificateUtil.ParseCertificateBase64(body);
             if (!CertificateUtil.CheckCertificate(cert, KeysManager.PublicKeyBase64))
             {
