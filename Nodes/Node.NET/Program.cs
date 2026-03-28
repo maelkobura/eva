@@ -7,6 +7,7 @@ using Eva.Node.Authority.Certificate;
 using Eva.Node.Loader;
 using Eva.Node.Network;
 using Eva.Node.Network.Discover;
+using Eva.Node.Service;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Mono.Options;
@@ -57,5 +58,9 @@ EntityManager.Init();
 NetworkManager.Init();
 NetworkManager.Instance.Start();
 NodeDiscover.Instance!.Discover(true);
+
+ServiceLoader.Init();
+ServiceLoader.Instance!.LoadService();
+
 Console.ReadKey(true);
 
