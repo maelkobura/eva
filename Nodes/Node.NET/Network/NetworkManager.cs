@@ -1,4 +1,5 @@
 ﻿using EmbedIO;
+using EmbedIO.WebApi;
 using Eva.AuthorityServer.System;
 using Eva.Commons.Util;
 using Eva.Node.Authority.Certificate;
@@ -22,7 +23,6 @@ public class NetworkManager
 
     public NetworkManager()
     {
-        
         bool enableTls = Configuration.Content["debug:skip-tls"] != "true";
         
         if(!enableTls)
@@ -32,12 +32,14 @@ public class NetworkManager
         
         Swan.Logging.Logger.NoLogging();
         server = new WebServer(o => o
-                .WithUrlPrefix($"http{(!enableTls ? "" : "s")}://localhost:{Configuration.Content["network:self:port"]}/")
+                .WithUrlPrefix(
+                    $"http{(!enableTls ? "" : "s")}://localhost:{Configuration.Content["network:self:port"]}/")
                 .WithMode(HttpListenerMode.EmbedIO)
                 .WithCertificate(!enableTls ? null : CertificateManager.Instance.TlsNodeCertificate))
             .WithLocalSessionManager()
             .WithModule(new AuthentificationMiddleware("/"))
-            .WithModule(new HandshakeRoute("/handshake", true));
+            .WithModule(new HandshakeRoute("/handshake", true))
+            .WithWebApi("/funcs", o => o.WithController<FunctionsController>());
     }
 
     public void Start()
