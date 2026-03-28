@@ -12,4 +12,8 @@
         <EmbeddedResource Include="authorization.txt" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Nodes\Node.NET\Node.NET.csproj" />
+    </ItemGroup>
+
 </Project>
