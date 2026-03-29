@@ -54,7 +54,7 @@ CertificateManager.Instance.GenerateEvaCertificate(description.Name);
 CertificateManager.Instance.GenerateTlsCertificate();
 
 NodeDiscover.Init(description);
-EntityManager.Init();
+NetworkNodeManager.Init();
 
 NetworkManager.Init();
 NetworkManager.Instance.Start();

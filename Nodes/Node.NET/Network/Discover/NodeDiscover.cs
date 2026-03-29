@@ -33,14 +33,14 @@ public class NodeDiscover
         foreach (var nodeDiscovered in nodesDiscovered)
         {
             if(nodeDiscovered.Key == Self.Name) continue;
-            if (EntityManager.Instance!.Nodes.FirstOrDefault(entity => entity.Name == nodeDiscovered.Key) == null)
+            if (NetworkNodeManager.Instance!.Nodes.FirstOrDefault(entity => entity.Name == nodeDiscovered.Key) == null)
             {
                 NodeEntity entity = new NodeEntity(nodeDiscovered.Key, nodeDiscovered.Value);
-                EntityManager.Instance!.Nodes.Add(entity);
+                NetworkNodeManager.Instance!.Nodes.Add(entity);
             }
         }
 
-        foreach (var node in EntityManager.Instance!.Nodes)
+        foreach (var node in NetworkNodeManager.Instance!.Nodes)
         {
             Authenticate(node.Name, firstConnection);
         }
@@ -49,7 +49,7 @@ public class NodeDiscover
 
     public void Authenticate(string name, bool firstConnection = false)
     {
-        var node = EntityManager.Instance!.Nodes.FirstOrDefault(entity => entity.Name == name);
+        var node = NetworkNodeManager.Instance!.Nodes.FirstOrDefault(entity => entity.Name == name);
         if (node == null) throw new Exception("Node not found: " + name);
         if (!node.IsExpirated()) return;
         

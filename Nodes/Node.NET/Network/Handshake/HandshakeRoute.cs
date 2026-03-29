@@ -86,7 +86,7 @@ public class HandshakeRoute : WebSocketModule
         
         if ((bool)context.Session["first"])
         {
-            EntityManager.Instance!.ResetCertificateForNode(GetSessionName(context));
+            NetworkNodeManager.Instance!.ResetCertificateForNode(GetSessionName(context));
         }
         
         NodeDiscover.Instance!.Authenticate(GetSessionName(context));
