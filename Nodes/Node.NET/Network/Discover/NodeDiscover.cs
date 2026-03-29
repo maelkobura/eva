@@ -61,6 +61,7 @@ public class NodeDiscover
             if(!string.IsNullOrEmpty(task.Result) && task.IsCompletedSuccessfully){
                 logger.LogInformation("Authenticated to node {0}", node.Name);
                 node.NodeTrustCertificate = Certificate.Parser.ParseFrom(Convert.FromBase64String(task.Result));
+                node.RefreshPanelAsync();
             }
         });
     }
