@@ -43,3 +43,14 @@ message FunctionPanel {
   repeated FunctionPanel sub_services = 3;
   string version = 4;
 }
+
+message InvokeRequest {
+  string caller_id = 1;
+  map<string, bytes> parameters = 2;
+}
+
+message InvokeResponse {
+  bool success = 1;
+  bytes result = 2;
+  optional string error = 3;
+}

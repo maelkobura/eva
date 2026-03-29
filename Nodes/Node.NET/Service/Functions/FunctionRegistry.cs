@@ -137,5 +137,12 @@ public class FunctionRegistry
         return panel;
     }
     
+    public FunctionExecutor? CreateExecutor(string functionName, bool skipAuthorization = false)
+    {
+        var descriptor = Get(functionName);
+        if (descriptor is null) return null;
+        return new FunctionExecutor(descriptor, skipAuthorization);
+    }
+    
 }
     
