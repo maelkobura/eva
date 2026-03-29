@@ -21,7 +21,7 @@ public class FunctionsUtil
         return new ReturnType { Type = MapPrimitive(type) };
     }
 
-    private static EvaType MapPrimitive(Type type) => type switch
+    public static EvaType MapPrimitive(Type type) => type switch
     {
         _ when type == typeof(string)   => EvaType.String,
         _ when type == typeof(int)      => EvaType.Int32,
