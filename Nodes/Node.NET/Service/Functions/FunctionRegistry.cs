@@ -99,73 +99,43 @@ public class FunctionRegistry
         return type;
     }
     
-    public FunctionPanel GetPanel()
+    public EvaFunctionDescriptor GetDescriptor(FunctionDescriptor descriptor)
     {
-        
-        List<EvaFunctionDescriptor> descs = new();
-
-        foreach (var descriptor in _functions.Values)
+        var evadesc = new EvaFunctionDescriptor()
         {
-            var evadesc = new EvaFunctionDescriptor()
-            {
-                Id = descriptor.Id,
-                Name =  descriptor.Name,
-                Description = descriptor.Description,
-                ReturnType = MapType(descriptor.ReturnType)
-            };
-            
-            evadesc.Keywords.Add(descriptor.Keywords);
-            evadesc.Authorization.Add(descriptor.Authorization);
+            Id = descriptor.Id,
+            Name = descriptor.Name,
+            Description = descriptor.Description,
+            ReturnType = FunctionsUtil.MapType(descriptor.ReturnType)
+        };
 
-            foreach (var param in descriptor.Parameters)
+        evadesc.Keywords.Add(descriptor.Keywords);
+        evadesc.Authorization.Add(descriptor.Authorization);
+
+        foreach (var param in descriptor.Parameters)
+        {
+            evadesc.Parameters.Add(new EvaParameterDescriptor
             {
-                evadesc.Parameters.Add(new EvaParameterDescriptor
-                {
-                    Name =  param.Name,
-                    Type = MapType(param.Type),
-                    IsRequired = param.IsRequired
-                });
-            }
-            
-            descs.Add(evadesc);
+                Name = param.Name,
+                Type = FunctionsUtil.MapType(param.Type),
+                IsRequired = param.IsRequired
+            });
         }
 
+        return evadesc;
+    }
+
+    public FunctionPanel GetPanel()
+    {
         var panel = new FunctionPanel
         {
             ServiceId = ServiceLoader.Instance!.ServiceId.ToSnakeCase(),
         };
-        panel.Functions.Add(descs);
+
+        panel.Functions.Add(_functions.Values.Select(GetDescriptor));
+
         return panel;
     }
     
-    private static ReturnType MapType(Type type)
-    {
-        if (type.IsArray)
-        {
-            var elementType = type.GetElementType()!;
-            return new ReturnType { Type = EvaType.Array, ArrayType = MapPrimitive(elementType) };
-        }
-
-        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
-        {
-            var elementType = type.GetGenericArguments()[0];
-            return new ReturnType { Type = EvaType.Array, ArrayType = MapPrimitive(elementType) };
-        }
-
-        return new ReturnType { Type = MapPrimitive(type) };
-    }
-
-    private static EvaType MapPrimitive(Type type) => type switch
-    {
-        _ when type == typeof(string)   => EvaType.String,
-        _ when type == typeof(int)      => EvaType.Int32,
-        _ when type == typeof(long)     => EvaType.Int64,
-        _ when type == typeof(bool)     => EvaType.Boolean,
-        _ when type == typeof(float)    => EvaType.Float,
-        _ when type == typeof(double)   => EvaType.Double,
-        _ when type == typeof(DateTime) => EvaType.Timestamp,
-        _ when type == typeof(byte[])   => EvaType.Bytes,
-        _                               => EvaType.Object
-    };
 }
     
