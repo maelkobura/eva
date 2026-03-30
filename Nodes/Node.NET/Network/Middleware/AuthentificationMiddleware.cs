@@ -29,14 +29,32 @@ public class AuthentificationMiddleware : WebModuleBase{
             } else if (_excludedPaths.Any(p => ctx.RequestedPath.StartsWith(p, StringComparison.OrdinalIgnoreCase))) {
                 
             } else {
+                
                 var certRaw = ConnectionUtil.GetCertificate(ctx);
                 var cert = CertificateUtil.ParseCertificateBase64(certRaw);
-                if (cert.Payload.Header.Type == Type.NodeTrust && !CertificateUtil.CheckCertificate(cert, CertificateManager.Instance!.CertificateUnit.Payload.Content.EntityPublicKey))
+                if (cert.Payload.Header.Type == Type.NodeTrust && !CertificateUtil.CheckCertificate(cert,
+                        CertificateManager.Instance!.CertificateUnit.Payload.Content.EntityPublicKey))
                 {
                     throw new Exception("Invalid token or expirated");
                 }
-                ctx.Items["certificate"] = cert;
-            
+                
+                if (ConnectionUtil.IsBorrowCertificate(ctx))
+                {
+                    var borrowCertRaw = ConnectionUtil.GetBorrowCertificate(ctx);
+                    var borrowCert = CertificateUtil.ParseCertificateBase64(borrowCertRaw);
+                    
+                    if (!CertificateUtil.CheckBorrowCertificate(borrowCert, cert, CertificateManager.Instance!.EasPublicKey))
+                    {
+                        throw new Exception("Invalid borrow token or expirated");
+                    }
+                    
+                    ctx.Items["certificate"] = borrowCert!;
+                    
+                }
+                else
+                {
+                    ctx.Items["certificate"] = cert;
+                }
             }
             await Task.CompletedTask;
         }

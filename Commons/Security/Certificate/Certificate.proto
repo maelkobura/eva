@@ -12,6 +12,7 @@ enum Type {
   EAS = 1;
   NODE_TRUST = 2;
   ENTITY = 3;
+  BORROW = 4;
 }
 
 enum EntityType {
@@ -35,6 +36,7 @@ message CertificateContent {
   string entity_public_key = 6;
   string signature_public_key = 7;
   EntityType entity_type = 8;
+  optional Certificate base_certificate = 9;
 }
 
 message CertificatePayload {

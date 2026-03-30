@@ -58,4 +58,37 @@ public class CertificateUtil
             return false;
         }
     }
+    
+    public static bool CheckBorrowCertificate(Certificate? borrowCert, Certificate? nodeTrustCert, string? publicKeyBase64 = null)
+    {
+        if (borrowCert == null || nodeTrustCert == null) return false;
+
+        // Check that it's actually a borrow cert
+        if (borrowCert.Payload.Header.Type != Type.Borrow) return false;
+
+        // Check expiration
+        if (borrowCert.Payload.Content.Expiration < DateTimeOffset.UtcNow.ToUnixTimeSeconds()) return false;
+
+        // Validate node trust cert with EAS public key
+        if (!CheckCertificate(nodeTrustCert, publicKeyBase64)) return false;
+
+        // Check that the base certificate exists
+        var baseCert = borrowCert.Payload.Content.BaseCertificate;
+        if (baseCert == null) return false;
+
+        // Validate user cert with EAS public key
+        if (!CheckCertificate(baseCert, publicKeyBase64)) return false;
+
+        // Check that the node trust cert subject matches the user cert subject
+        // (proves that node A is the intended recipient of the borrow cert)
+        if (nodeTrustCert.Payload.Content.Subject != baseCert.Payload.Content.Subject) return false;
+
+        // Validate borrow cert signature using user's signature public key
+        if (!CheckCertificate(borrowCert, baseCert.Payload.Content.SignaturePublicKey)) return false;
+
+        // Check that borrow cert authorizations are a subset of the user cert authorizations
+        if (!borrowCert.Payload.Content.Authorization.All(a => Authorizations.Has(baseCert, a))) return false;
+
+        return true;
+    }
 }
