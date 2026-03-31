@@ -10,6 +10,9 @@ public class FunctionDescriptor
     public required ParameterDescriptor[] Parameters { get; init; }
     public required Type ReturnType { get; init; }
     public required Func<object?[], Task<object?>> Invoke { get; init; }
+    public required bool Depreciated { get; init; }
+    public required int Weight { get; init; }
+    public required string[] Flags { get; init; }
 }
 
 public class ParameterDescriptor

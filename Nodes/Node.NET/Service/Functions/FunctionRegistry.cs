@@ -38,6 +38,9 @@ public class FunctionRegistry
             Authorization = attr.Authorization,
             Parameters = parameters,
             ReturnType = UnwrapReturnType(method.ReturnType),
+            Depreciated = attr.Depreciated,
+            Weight = attr.Weight,
+            Flags = attr.Flags,
             Invoke = args => InvokeMethod(target, method, args)
         };
     }
@@ -47,6 +50,9 @@ public class FunctionRegistry
         string description,
         string[] keywords,
         Delegate lambda,
+        bool depreciated = false,
+        int weight = 0,
+        string[] flags = null,
         string[] authorization = null)
     {
         var method = lambda.Method;
@@ -67,7 +73,10 @@ public class FunctionRegistry
             Authorization = authorization ?? Array.Empty<string>(),
             Parameters = parameters,
             ReturnType = UnwrapReturnType(method.ReturnType),
-            Invoke = args => InvokeMethod(lambda.Target, method, args)
+            Invoke = args => InvokeMethod(lambda.Target, method, args),
+            Depreciated = depreciated,
+            Weight = weight,
+            Flags = flags ?? Array.Empty<string>()
         };
     }
     
@@ -106,9 +115,13 @@ public class FunctionRegistry
             Id = descriptor.Id,
             Name = descriptor.Name,
             Description = descriptor.Description,
-            ReturnType = FunctionsUtil.MapType(descriptor.ReturnType)
+            ReturnType = FunctionsUtil.MapType(descriptor.ReturnType),
+            Depreciated = descriptor.Depreciated,
+            Weight = descriptor.Weight
         };
-
+        
+        
+        evadesc.Flags.Add(descriptor.Flags);
         evadesc.Keywords.Add(descriptor.Keywords);
         evadesc.Authorization.Add(descriptor.Authorization);
 

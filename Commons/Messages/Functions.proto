@@ -28,13 +28,16 @@ message ReturnType {
 }
 
 message EvaFunctionDescriptor {
-  string id = 1;          // Guid généré côté serveur au moment de la sérialisation
-  string name = 2;
-  string description = 3;
-  repeated string keywords = 4;
-  repeated string authorization = 5;
-  repeated EvaParameterDescriptor parameters = 6;
-  ReturnType return_type = 7; // idem, nom du type C# en string
+  string id = 1; // Function UniqueID
+  string name = 2; // Function name
+  string description = 3; // Function description
+  repeated string keywords = 4; // Function keyword for tool search engine
+  repeated string authorization = 5; // Required AND permission for use the function
+  repeated EvaParameterDescriptor parameters = 6; // Function parameters
+  ReturnType return_type = 7; // Return type
+  optional int32 weight = 8; // Function weight (higher = more heavy to run and more time needed)
+  bool depreciated = 9; // If function is depreciated
+  repeated string flags = 10; // Function flags (e.g. model:hidden, service:hidden, client:desktop, etc.)
 }
 
 message FunctionPanel {
