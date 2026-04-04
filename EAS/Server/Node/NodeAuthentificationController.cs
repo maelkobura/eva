@@ -59,10 +59,10 @@ public class NodeAuthentificationController : WebApiController{
             
             
             
-            var nodeCert = EvaSystem.Singleton<ICAManager>().IssueNodeCertificate(contract.Host);
+            var nodeCert = EvaSystem.Singleton<ITlsAuthority>().IssueNodeCertificate(contract.Host);
             
             HttpContext.Response.StatusCode = 200;
-            return new {code=200,nodeCert=Convert.ToBase64String(nodeCert.Export(X509ContentType.Pfx)),easCert=Convert.ToBase64String(EvaSystem.Singleton<ICAManager>().CA!.Export(X509ContentType.Cert))};
+            return new {code=200,nodeCert=Convert.ToBase64String(nodeCert.Export(X509ContentType.Pfx)),easCert=Convert.ToBase64String(EvaSystem.Singleton<ITlsAuthority>().CA!.Export(X509ContentType.Cert))};
         }
         catch (Exception e)
         {

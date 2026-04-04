@@ -7,9 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Eva.AuthorityServer.Security.Certificate;
 
-internal class InternalCAManager : ICAManager
+internal class InternalTlsAuthority : ITlsAuthority
 {
-    private static ILogger logger = EvaLogger.CreateLogger<InternalCAManager>();
+    private static ILogger logger = EvaLogger.CreateLogger<InternalTlsAuthority>();
 
     public X509Certificate2? CA { get; private set; }
 

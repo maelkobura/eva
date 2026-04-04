@@ -56,8 +56,8 @@ class Program
         EvaSystem.AddSingleton<ICertificateManager,InternalCertificateManager>(EvaSystem.Singleton<IKeysManager>().PublicKeyBase64, EvaSystem.Singleton<IKeysManager>().PrivateKeyBase64);
         EvaSystem.AddSingleton<INodeRegistry,InternalNodeRegistry>(nodeDir);
         EvaSystem.AddSingleton<IAuthorityServerManager, InternalAuthorityServerManager>();
-        EvaSystem.AddSingleton<ICAManager,InternalCAManager>();
-        EvaSystem.Singleton<ICAManager>().GenerateCA();
+        EvaSystem.AddSingleton<ITlsAuthority,InternalTlsAuthority>();
+        EvaSystem.Singleton<ITlsAuthority>().GenerateCA();
         
         EvaSystem.Singleton<IAuthorityServerManager>().Start();
         Console.ReadKey(true);

@@ -2,7 +2,7 @@
 
 namespace Eva.AuthorityServer.Security.Certificate;
 
-public interface ICAManager : IDisposable
+public interface ITlsAuthority : IDisposable
 {
     /// <summary>
     /// Current Certificate Authority certificate.
