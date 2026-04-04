@@ -37,7 +37,7 @@ public class EvaSystemTests
     [Fact]
     public void AddSingleton_Should_Register_And_Return_Instance()
     {
-        var instance = EvaSystem.AddSingleton<ITestService, TestService>(new object[] { 42 });
+        var instance = EvaSystem.AddSingleton<ITestService, TestService>(42);
 
         Assert.NotNull(instance);
         Assert.Equal(42, instance.Value);
@@ -47,7 +47,7 @@ public class EvaSystemTests
     [Fact]
     public void Singleton_Should_Return_Same_Instance()
     {
-        var instance1 = EvaSystem.AddSingleton<ITestService, TestService>(new object[] { 10 });
+        var instance1 = EvaSystem.AddSingleton<ITestService, TestService>(10);
         var instance2 = EvaSystem.Singleton<ITestService>();
 
         Assert.Same(instance1, instance2);
@@ -57,10 +57,10 @@ public class EvaSystemTests
     [Fact]
     public void AddSingleton_Should_Throw_If_Already_Registered()
     {
-        EvaSystem.AddSingleton<ITestService, TestService>(new object[] { 1 });
+        EvaSystem.AddSingleton<ITestService, TestService>(10);
 
         Assert.Throws<ArgumentException>(() =>
-            EvaSystem.AddSingleton<ITestService, TestService>(new object[] { 2 })
+            EvaSystem.AddSingleton<ITestService, TestService>(2)
         );
         EvaSystem.Clear();
     }
@@ -78,7 +78,7 @@ public class EvaSystemTests
     public void Clear_Should_Dispose_And_Remove_All_Singletons()
     {
 
-        var instance = EvaSystem.AddSingleton<ITestService, TestService>(new object[] { 5 });
+        var instance = EvaSystem.AddSingleton<ITestService, TestService>(5);
 
         EvaSystem.Clear();
 
