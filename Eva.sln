@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EvaEngine", "Services\EvaEn
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utilities", "Utilities", "{88D01979-57CD-4B7A-9C13-E15853F918A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Node.NET", "Tests\Node\Tests.Node.NET\Tests.Node.NET.csproj", "{7B78B9D9-0867-4FBC-B520-8284B1FDDD64}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +56,10 @@ Global
 		{4F67B902-697E-4BBC-8461-2E892D507C47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F67B902-697E-4BBC-8461-2E892D507C47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F67B902-697E-4BBC-8461-2E892D507C47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B78B9D9-0867-4FBC-B520-8284B1FDDD64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B78B9D9-0867-4FBC-B520-8284B1FDDD64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B78B9D9-0867-4FBC-B520-8284B1FDDD64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B78B9D9-0867-4FBC-B520-8284B1FDDD64}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7C36EB99-FB95-407E-A66F-A057DC7F4161} = {4286746C-AAFE-4AF8-9A74-C65207C90C7A}
