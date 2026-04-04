@@ -1,5 +1,6 @@
-﻿using Eva.Commons.Messages;
+using Eva.Commons.Messages;
 using Eva.Commons.Security.Certificate;
+using Eva.Commons.System;
 using Eva.Node.Network;
 using Eva.Node.Service;
 using Eva.Node.Service.Functions;
@@ -33,7 +34,7 @@ public class TerminalSession : IDisposable{
         var evaObj = new JsObject(_engine);
         _engine.SetValue("eva", evaObj);
         
-        foreach (var node in NetworkNodeManager.Instance!.Nodes)
+        foreach (var node in EvaSystem.Singleton<INetworkNodeManager>().Nodes)
         {
             BuildServiceObject(node);
         }

@@ -2,6 +2,7 @@
 using EmbedIO;
 using Eva.AuthorityServer.System;
 using Eva.Commons.Security.Certificate;
+using Eva.Commons.System;
 using Eva.Commons.Util;
 using Eva.Node.Authority.Certificate;
 using Newtonsoft.Json;
@@ -33,7 +34,7 @@ public class AuthentificationMiddleware : WebModuleBase{
                 var certRaw = ConnectionUtil.GetCertificate(ctx);
                 var cert = CertificateUtil.ParseCertificateBase64(certRaw);
                 if (cert.Payload.Header.Type == Type.NodeTrust && !CertificateUtil.CheckCertificate(cert,
-                        CertificateManager.Instance!.CertificateUnit.Payload.Content.EntityPublicKey))
+                        EvaSystem.Singleton<ICertificateManager>().CertificateUnit.Payload.Content.EntityPublicKey))
                 {
                     throw new Exception("Invalid token or expirated");
                 }
@@ -43,7 +44,7 @@ public class AuthentificationMiddleware : WebModuleBase{
                     var borrowCertRaw = ConnectionUtil.GetBorrowCertificate(ctx);
                     var borrowCert = CertificateUtil.ParseCertificateBase64(borrowCertRaw);
                     
-                    if (!CertificateUtil.CheckBorrowCertificate(borrowCert, cert, CertificateManager.Instance!.EasPublicKey))
+                    if (!CertificateUtil.CheckBorrowCertificate(borrowCert, cert, EvaSystem.Singleton<ICertificateManager>().EasPublicKey))
                     {
                         throw new Exception("Invalid borrow token or expirated");
                     }

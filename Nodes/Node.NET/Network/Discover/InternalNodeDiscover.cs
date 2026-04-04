@@ -1,4 +1,7 @@
-﻿using Eva.Commons.Security.Certificate;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Eva.Commons.Security.Certificate;
 using Eva.Commons.System;
 using Eva.Commons.Util;
 using Eva.Node.Authority;
@@ -9,20 +12,15 @@ using Newtonsoft.Json;
 
 namespace Eva.Node.Network.Discover;
 
-public class NodeDiscover
+
+
+public class InternalNodeDiscover : INodeDiscover
 {
-    public static NodeDiscover? Instance { get; private set; }
-    private static ILogger logger = EvaLogger.CreateLogger<NodeDiscover>();
+    private static ILogger logger = EvaLogger.CreateLogger<InternalNodeDiscover>();
 
-    public readonly ServiceDescription Self;
-    
-    public static void Init(ServiceDescription self)
-    {
-        if (Instance != null) return;
-        Instance = new NodeDiscover(self);
-    }
+    public ServiceDescription Self { get; }
 
-    public NodeDiscover(ServiceDescription self)
+    public InternalNodeDiscover(ServiceDescription self)
     {
         this.Self = self;
     }
@@ -34,14 +32,14 @@ public class NodeDiscover
         foreach (var nodeDiscovered in nodesDiscovered)
         {
             if(nodeDiscovered.Key == Self.Name) continue;
-            if (NetworkNodeManager.Instance!.Nodes.FirstOrDefault(entity => entity.Name == nodeDiscovered.Key) == null)
+            if (EvaSystem.Singleton<INetworkNodeManager>().Nodes.FirstOrDefault(entity => entity.Name == nodeDiscovered.Key) == null)
             {
                 NodeEntity entity = new NodeEntity(nodeDiscovered.Key, nodeDiscovered.Value);
-                NetworkNodeManager.Instance!.Nodes.Add(entity);
+                EvaSystem.Singleton<INetworkNodeManager>().Nodes.Add(entity);
             }
         }
 
-        foreach (var node in NetworkNodeManager.Instance!.Nodes)
+        foreach (var node in EvaSystem.Singleton<INetworkNodeManager>().Nodes)
         {
             Authenticate(node.Name, firstConnection);
         }
@@ -50,7 +48,7 @@ public class NodeDiscover
 
     public void Authenticate(string name, bool firstConnection = false)
     {
-        var node = NetworkNodeManager.Instance!.Nodes.FirstOrDefault(entity => entity.Name == name);
+        var node = EvaSystem.Singleton<INetworkNodeManager>().Nodes.FirstOrDefault(entity => entity.Name == name);
         if (node == null) throw new Exception("Node not found: " + name);
         if (!node.IsExpirated()) return;
         
@@ -76,5 +74,8 @@ public class NodeDiscover
         return JsonConvert.DeserializeObject<Dictionary<string, string>>(content);
     }
 
-
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+    }
 }

@@ -1,7 +1,8 @@
-﻿using System.Text;
+using System.Text;
 using Eva.Commons.Messages;
 using Eva.Commons.Security;
 using Eva.Commons.Security.Certificate;
+using Eva.Commons.System;
 using Eva.Node.Service;
 using Eva.Node.Service.Functions;
 using Google.Protobuf;
@@ -21,7 +22,7 @@ public static class EvaServices
         var nodeId = fullName[..lastDot];
         var functionName = fullName[(lastDot + 1)..];
 
-        var node = NetworkNodeManager.Instance!.Nodes.FirstOrDefault(n => n.Name == nodeId);
+        var node = EvaSystem.Singleton<INetworkNodeManager>().Nodes.FirstOrDefault(n => n.Name == nodeId);
         
         // Loopback
         if (nodeId == ServiceLoader.Instance!.Description!.Name)
@@ -77,7 +78,7 @@ public static class EvaServices
         var lastDot = fullName.LastIndexOf('.');
         var nodeId = fullName[..lastDot];
 
-        var node = NetworkNodeManager.Instance!.Nodes.FirstOrDefault(n => n.Name == nodeId);
+        var node = EvaSystem.Singleton<INetworkNodeManager>().Nodes.FirstOrDefault(n => n.Name == nodeId);
         if (node is null)
             throw new Exception($"Node '{nodeId}' not found");
 
@@ -117,6 +118,6 @@ public static class EvaServices
 
     public static bool IsServiceAvailable(string name)
     {
-        return !NetworkNodeManager.Instance!.Nodes.First(entity => entity.Name == name).IsExpirated();
+        return !EvaSystem.Singleton<INetworkNodeManager>().Nodes.First(entity => entity.Name == name).IsExpirated();
     }
 }

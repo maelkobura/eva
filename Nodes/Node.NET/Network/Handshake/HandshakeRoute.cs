@@ -1,8 +1,9 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using EmbedIO.WebSockets;
 using Eva.Commons.Messages;
 using Eva.Commons.Security;
 using Eva.Commons.Security.Certificate;
+using Eva.Commons.System;
 using Eva.Commons.Util;
 using Eva.Node.Authority.Certificate;
 using Eva.Node.Network.Discover;
@@ -38,7 +39,7 @@ public class HandshakeRoute : WebSocketModule
         var initPayload  = HandshakeInitialization.Parser.ParseFrom(message.Payload.ToByteArray());
         var certificate  = Certificate.Parser.ParseFrom(Base64.Base64UrlDecode(initPayload.Certificate));
 
-        bool isValid = CertificateUtil.CheckCertificate(certificate, CertificateManager.Instance!.EasPublicKey)
+        bool isValid = CertificateUtil.CheckCertificate(certificate, EvaSystem.Singleton<ICertificateManager>().EasPublicKey)
                     && certificate.Payload.Content.Subject == initPayload.Name;
 
         if (!isValid)
@@ -86,10 +87,10 @@ public class HandshakeRoute : WebSocketModule
         
         if ((bool)context.Session["first"])
         {
-            NetworkNodeManager.Instance!.ResetCertificateForNode(GetSessionName(context));
+            EvaSystem.Singleton<INetworkNodeManager>().ResetCertificateForNode(GetSessionName(context));
         }
         
-        NodeDiscover.Instance!.Authenticate(GetSessionName(context));
+        EvaSystem.Singleton<INodeDiscover>().Authenticate(GetSessionName(context));
     }
 
     private static void StoreSession(IWebSocketContext context, Certificate certificate, string name, bool firstConnection)
@@ -109,11 +110,11 @@ public class HandshakeRoute : WebSocketModule
     {
         var content = new CertificateContent
         {
-            Issuer          = NodeDiscover.Instance!.Self.Name,
+            Issuer          = EvaSystem.Singleton<INodeDiscover>().Self.Name,
             Subject         = GetSessionName(context),
             UniqueId        = Base64.GenerateToken(),
             Expiration      = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600,
-            EntityPublicKey = CertificateManager.Instance!.CertificateUnit.Payload.Content.EntityPublicKey,
+            EntityPublicKey = EvaSystem.Singleton<ICertificateManager>().CertificateUnit.Payload.Content.EntityPublicKey,
         };
         content.Authorization.Add(sourceCert.Payload.Content.Authorization);
 
@@ -130,8 +131,8 @@ public class HandshakeRoute : WebSocketModule
 
         return CertificateUtil.SignCertificate(
             payload,
-            CertificateManager.Instance!.PrivateKey,
-            CertificateManager.Instance!.EasPublicKey);
+            EvaSystem.Singleton<ICertificateManager>().PrivateKey,
+            EvaSystem.Singleton<ICertificateManager>().EasPublicKey);
     }
 
     private static async Task SendValidationAsync(

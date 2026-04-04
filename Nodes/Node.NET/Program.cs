@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Eva.AuthorityServer.System;
 using Eva.Commons.System;
@@ -50,16 +50,16 @@ EvaSystem.AddSingleton<IAuthorityClient, InternalAuthorityClient>(
     Configuration.Content.GetSection("eas:main").Get<AuthorityConnectionInfo>(), 
     Configuration.Content.GetSection("eas:backup").Get<AuthorityConnectionInfo>());
 
-CertificateManager.Init(Configuration.Content.GetSection("authentification:token").Get<string>());
-CertificateManager.Instance.GenerateEvaCertificate(description.Name);
-CertificateManager.Instance.GenerateTlsCertificate();
+EvaSystem.AddSingleton<ICertificateManager, InternalCertificateManager>(Configuration.Content.GetSection("authentification:token").Get<string>());
+EvaSystem.Singleton<ICertificateManager>().GenerateEvaCertificate(description.Name);
+EvaSystem.Singleton<ICertificateManager>().GenerateTlsCertificate();
 
-NodeDiscover.Init(description);
-NetworkNodeManager.Init();
+EvaSystem.AddSingleton<INodeDiscover, InternalNodeDiscover>(description);
+EvaSystem.AddSingleton<INetworkNodeManager, InternalNetworkNodeManager>();
 
 EvaSystem.AddSingleton<INetworkManager, InternalNetworkManager>();
 EvaSystem.Singleton<INetworkManager>().Start();
-NodeDiscover.Instance!.Discover(true);
+EvaSystem.Singleton<INodeDiscover>().Discover(true);
 
 FunctionRegistry.Init();
 

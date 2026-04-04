@@ -3,6 +3,7 @@ using System.Security.Cryptography.X509Certificates;
 using Eva.Commons.Messages;
 using Eva.Commons.Security;
 using Eva.Commons.Security.Certificate;
+using Eva.Commons.System;
 using Eva.Commons.Util;
 using Eva.Node.Authority.Certificate;
 using Google.Protobuf;
@@ -26,17 +27,18 @@ public class HandshakeClient
 public async Task<string?> Handshake(bool firstConnection = false)
 {
     using var ws = new ClientWebSocket();
+    var cm = EvaSystem.Singleton<ICertificateManager>();
 
     using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10)); // timeout global
 
     bool secure = false;
     
-    if (CertificateManager.Instance!.TlsEasCertificate is not null)
+    if (cm.TlsEasCertificate is not null)
     {
         ws.Options.RemoteCertificateValidationCallback = (_, cert, chain, errors) =>
         {
             chain!.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
-            chain.ChainPolicy.CustomTrustStore.Add(CertificateManager.Instance.TlsEasCertificate);
+            chain.ChainPolicy.CustomTrustStore.Add(cm.TlsEasCertificate);
             return chain.Build(new X509Certificate2(cert!));
         };
         secure = true;
@@ -54,8 +56,8 @@ public async Task<string?> Handshake(bool firstConnection = false)
         // ---- INIT ----
         var initPayload = new HandshakeInitialization
         {
-            Name = CertificateManager.Instance!.CertificateUnit.Payload.Content.Subject,
-            Certificate = CertificateManager.Instance.CertificateRaw,
+            Name = cm!.CertificateUnit.Payload.Content.Subject,
+            Certificate = cm.CertificateRaw,
             Initialization = firstConnection
         };
 
@@ -77,7 +79,7 @@ public async Task<string?> Handshake(bool firstConnection = false)
         var challengeProduct = challenge.FirstFactor * challenge.SecondFactor;
         var signature = SignatureUtil.SignInt(
             challengeProduct,
-            CertificateManager.Instance!.PrivateKey
+            cm!.PrivateKey
         );
         var resultPayload = new HandshakeChallengeResult
         {

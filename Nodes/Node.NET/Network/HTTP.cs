@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography.X509Certificates;
+using Eva.Commons.System;
 using Eva.Node.Authority.Certificate;
 
 namespace Eva.Node.Network;
@@ -10,12 +11,12 @@ public class HTTP
         secure = false;
         var handler = new HttpClientHandler();
 
-        if (CertificateManager.Instance!.TlsEasCertificate is not null)
+        if (EvaSystem.Singleton<ICertificateManager>().TlsEasCertificate is not null)
         {
             handler.ServerCertificateCustomValidationCallback = (_, cert, chain, errors) =>
             {
                 chain!.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
-                chain.ChainPolicy.CustomTrustStore.Add(CertificateManager.Instance.TlsEasCertificate);
+                chain.ChainPolicy.CustomTrustStore.Add(EvaSystem.Singleton<ICertificateManager>().TlsEasCertificate);
                 return chain.Build(new X509Certificate2(cert!));
             };
             secure = true;

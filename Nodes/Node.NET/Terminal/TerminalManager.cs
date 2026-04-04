@@ -1,4 +1,5 @@
 ﻿using Eva.Commons.Security.Certificate;
+using Eva.Commons.System;
 using Eva.Commons.Util;
 using Eva.Node.Authority.Certificate;
 using Eva.Node.Network;
@@ -21,7 +22,7 @@ public class TerminalManager
 
     public static TerminalSession CreateSession(string sessionId)
     {
-        var session = new TerminalSession(CertificateManager.Instance!.CertificateUnit!);
+        var session = new TerminalSession(EvaSystem.Singleton<ICertificateManager>().CertificateUnit!);
         _sessions[sessionId] = session;
         return session;
     }

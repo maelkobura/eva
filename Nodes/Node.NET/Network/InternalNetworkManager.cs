@@ -1,6 +1,7 @@
 ﻿using EmbedIO;
 using EmbedIO.WebApi;
 using Eva.AuthorityServer.System;
+using Eva.Commons.System;
 using Eva.Commons.Util;
 using Eva.Node.Authority.Certificate;
 using Eva.Node.Network.Middleware;
@@ -28,7 +29,7 @@ public class InternalNetworkManager : INetworkManager
         _server = new WebServer(o => o
                 .WithUrlPrefix($"http{(!enableTls ? "" : "s")}://localhost:{Configuration.Content["network:self:port"]}/")
                 .WithMode(HttpListenerMode.EmbedIO)
-                .WithCertificate(!enableTls ? null : CertificateManager.Instance.TlsNodeCertificate))
+                .WithCertificate(!enableTls ? null : EvaSystem.Singleton<ICertificateManager>().TlsNodeCertificate))
             .WithLocalSessionManager()
             .WithModule(new AuthentificationMiddleware("/"))
             .WithModule(new HandshakeRoute("/handshake", true))
