@@ -11,8 +11,6 @@ public class InternalUserAuthenticator : IUserAuthenticator {
     
     public InternalUserAuthenticator()
     {
-        logger.LogInformation("Initializing UserAuthenticator...");
-        
         string host = Configuration.Content["database:userAuthentification:host"] ?? "localhost";
         string port = Configuration.Content["database:userAuthentification:port"] ?? "5432";
         string database = Configuration.Content["database:userAuthentification:database"] ?? "evauser";

@@ -14,7 +14,6 @@ public class InternalKeysManager : IKeysManager{
 
     public InternalKeysManager()
     {
-        logger.LogInformation("Initializing KeysManager...");
         GenerateKeys();
         logger.LogInformation("Public key: {}", 
             PublicKeyBase64);
