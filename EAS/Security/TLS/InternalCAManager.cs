@@ -5,27 +5,20 @@ using Eva.AuthorityServer.System;
 using Eva.Commons.Util;
 using Microsoft.Extensions.Logging;
 
-namespace Eva.AuthorityServer.Security.TLS;
+namespace Eva.AuthorityServer.Security.Certificate;
 
-public class CAManager
+internal class InternalCAManager : ICAManager
 {
-    public static CAManager? Instance { get; private set; }
-    private static ILogger logger = EvaLogger.CreateLogger<CAManager>();
-    
-    public X509Certificate2? CA { get; private set; }
+    private static ILogger logger = EvaLogger.CreateLogger<InternalCAManager>();
 
-    public static void Init()
-    {
-        if (Instance != null) return;
-        Instance = new CAManager();
-    }
+    public X509Certificate2? CA { get; private set; }
 
     public X509Certificate2 GenerateCA()
     {
-        if(CA is not null) return CA;
-        
+        if (CA is not null) return CA;
+
         using var rsa = RSA.Create(4096);
-    
+
         var request = new CertificateRequest(
             "CN=EAS CA, O=EvaNetwork",
             rsa,
@@ -57,11 +50,12 @@ public class CAManager
         CA = cert;
         return cert;
     }
-    
-    public X509Certificate2 IssueNodeCertificate(string nodeId) {
-        
-        if(CA is null) throw new Exception("CA not initialized");
-        
+
+    public X509Certificate2 IssueNodeCertificate(string nodeId)
+    {
+        if (CA is null)
+            throw new Exception("CA not initialized");
+
         using var rsa = RSA.Create(2048);
 
         var request = new CertificateRequest(
@@ -81,23 +75,31 @@ public class CAManager
                 critical: true
             )
         );
-        
+
         var san = new SubjectAlternativeNameBuilder();
+
         if (IPAddress.TryParse(nodeId, out var ip))
             san.AddIpAddress(ip);
         else
             san.AddDnsName(nodeId);
-        if(bool.Parse(Configuration.Content["debug.tls.allow-loopback"] ?? "false")) san.AddDnsName("localhost");
+
+        if (bool.Parse(Configuration.Content["debug.tls.allow-loopback"] ?? "false"))
+            san.AddDnsName("localhost");
+
         request.CertificateExtensions.Add(san.Build());
 
         var cert = request.Create(
-            CA!,
+            CA,
             DateTimeOffset.UtcNow,
-            DateTimeOffset.UtcNow.AddDays(90), 
+            DateTimeOffset.UtcNow.AddDays(90),
             Guid.NewGuid().ToByteArray()
         );
-        
+
         return cert.CopyWithPrivateKey(rsa);
     }
-    
+
+    public void Dispose()
+    {
+        CA?.Dispose();
+    }
 }

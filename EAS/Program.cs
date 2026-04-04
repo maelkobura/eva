@@ -4,7 +4,6 @@ using System.Runtime.InteropServices;
 using Eva.AuthorityServer.Nodes;
 using Eva.AuthorityServer.Security;
 using Eva.AuthorityServer.Security.Certificate;
-using Eva.AuthorityServer.Security.TLS;
 using Eva.AuthorityServer.Server;
 using Eva.AuthorityServer.System;
 using Eva.AuthorityServer.User;
@@ -56,10 +55,9 @@ class Program
         EvaSystem.AddSingleton<IUserAuthenticator,InternalUserAuthenticator>();
         EvaSystem.AddSingleton<ICertificateManager,InternalCertificateManager>(EvaSystem.Singleton<IKeysManager>().PublicKeyBase64, EvaSystem.Singleton<IKeysManager>().PrivateKeyBase64);
         EvaSystem.AddSingleton<INodeRegistry,InternalNodeRegistry>(nodeDir);
-        //PermissionsManager
         EvaSystem.AddSingleton<IAuthorityServerManager, InternalAuthorityServerManager>();
-        CAManager.Init();
-        CAManager.Instance!.GenerateCA();
+        EvaSystem.AddSingleton<ICAManager,InternalCAManager>();
+        EvaSystem.Singleton<ICAManager>().GenerateCA();
         
         EvaSystem.Singleton<IAuthorityServerManager>().Start();
         Console.ReadKey(true);
