@@ -2,7 +2,6 @@
 
 namespace Tests.Commons.Security;
 
-using System.Collections.Generic;
 using Eva.Commons.Security.Certificate;
 using Xunit;
 

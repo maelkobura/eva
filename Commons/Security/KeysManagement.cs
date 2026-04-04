@@ -2,7 +2,6 @@
 
 using NSec.Cryptography;
 using System;
-using System.Text;
 
 public class KeysManagement
 {
