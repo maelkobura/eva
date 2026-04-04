@@ -32,7 +32,7 @@ public class UserAuthentificationController : WebApiController {
 
         try
         {
-            var user = UserAuthenticator.Login(username, code);
+            var user = EvaSystem.Singleton<IUserAuthenticator>().Login(username, code);
             var cert = CertificateManager.GenerateCertificate(user, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600, publicKey);
             
             HttpContext.Response.StatusCode = 200;

@@ -4,16 +4,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Eva.AuthorityServer.User;
 
-public class UserAuthenticator
-{
-    private static ILogger logger = EvaLogger.CreateLogger<UserAuthenticator>();
-
-    public static bool IsInitialized { get; private set; } = false;
-    private static UserDatabaseContext context;
+public class InternalUserAuthenticator : IUserAuthenticator {
+    private static ILogger logger = EvaLogger.CreateLogger<InternalUserAuthenticator>();
     
-    public static void Init()
+    private UserDatabaseContext context;
+    
+    public InternalUserAuthenticator()
     {
-        if (IsInitialized) return;
         logger.LogInformation("Initializing UserAuthenticator...");
         
         string host = Configuration.Content["database:userAuthentification:host"] ?? "localhost";
@@ -40,12 +37,10 @@ public class UserAuthenticator
             context.SaveChanges();
             logger.LogInformation("Default user created.");
         }
-        IsInitialized = true;
     }
     
-    public static UserEntity Login(string username, string code)
+    public UserEntity Login(string username, string code)
     {
-        if (!IsInitialized) throw new Exception("UserAuthenticator is not initialized.");
         context.Database.EnsureCreated();
         
         //TODO PBKDF2
@@ -53,5 +48,10 @@ public class UserAuthenticator
         if (user == null) throw new Exception("User not found.");
         if (user.Code != code) throw new Exception("Invalid code.");
         return user;
+    }
+
+    public void Dispose()
+    {
+        context.Dispose();
     }
 }

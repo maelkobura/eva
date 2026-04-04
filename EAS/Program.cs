@@ -53,7 +53,7 @@ class Program
         Configuration.Init(configPath, configOverride, templateStream);
 
         EvaSystem.AddSingleton<IKeysManager,InternalKeysManager>();
-        UserAuthenticator.Init();
+        EvaSystem.AddSingleton<IUserAuthenticator,InternalUserAuthenticator>();
         CertificateManager.Init(EvaSystem.Singleton<IKeysManager>().PublicKeyBase64, EvaSystem.Singleton<IKeysManager>().PrivateKeyBase64);
         NodeRegistry.Init(nodeDir);
         //PermissionsManager
