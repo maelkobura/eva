@@ -12,10 +12,6 @@ public class UserService : EvaService {
     public void Initialize()
     {
         logger.LogInformation("Hello from UserService");
-        FunctionRegistry.Instance!.RegisterLambda("update_user_data", "Update user data", new[] { "user", "data" }, () =>
-        {
-            //Do nothing
-        });
     }
 
     public void Shutdown()
