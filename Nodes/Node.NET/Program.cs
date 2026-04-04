@@ -62,7 +62,7 @@ NodeDiscover.Instance!.Discover(true);
 
 FunctionRegistry.Init();
 
-ServiceLoader.Init();
+ServiceLoader.Init(description);
 ServiceLoader.Instance!.LoadService();
 
 Console.ReadKey(true);
