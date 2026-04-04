@@ -1,0 +1,41 @@
+﻿using Eva.Commons.Util;
+using Microsoft.Extensions.Logging;
+
+namespace Eva.Commons.System;
+
+public class EvaSystem
+{
+    private static readonly ILogger logger = EvaLogger.CreateLogger<EvaSystem>();
+    
+    
+    private static readonly Dictionary<Type, IDisposable> _singletons = new();
+
+    public static TSingleton AddSingleton<TInterface, TSingleton>(object[] args) where TInterface : IDisposable where TSingleton : TInterface{
+        Type inter = typeof(TInterface);
+        Type typeSingleton = typeof(TSingleton);
+        
+        if(!typeof(TSingleton).IsAssignableTo(inter)) throw new ArgumentException("The type " + inter.Name + " must be an interface of " + typeSingleton.Name);
+        if(_singletons.ContainsKey(inter)) throw new ArgumentException("The singleton " + inter.Name + " is already registered");
+        
+        logger.LogInformation("Loading " + typeSingleton.Name +"...");
+        
+        var instance = (TSingleton)Activator.CreateInstance(typeof(TSingleton), args)!;
+        _singletons[typeof(TInterface)] = instance;
+        return instance;
+    }
+    
+    public static TInterface Singleton<TInterface>() where TInterface : class {
+        if(!_singletons.ContainsKey(typeof(TInterface))) throw new ArgumentException("The singleton " + typeof(TInterface).Name + " is not registered");
+        return (TInterface)_singletons[typeof(TInterface)];
+    }
+
+    public static void Clear()
+    {
+        logger.LogWarning("Clearing singletons...");
+        foreach (var singleton in _singletons.Values)
+        {
+            singleton.Dispose();
+        }
+        _singletons.Clear();
+    }
+}
