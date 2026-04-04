@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Eva.Commons.Util;
 
@@ -16,5 +17,14 @@ public static class StringExtensions
             sb.Append(char.ToLower(str[i]));
         }
         return sb.ToString();
+    }
+    
+    public static string SplitSingletonName(this string input)
+    {
+        // Remove prefix
+        input = Regex.Replace(input, "^Internal", "");
+
+        // Split PascalCase
+        return Regex.Replace(input, "(\\B[A-Z])", " $1");
     }
 }

@@ -1,4 +1,5 @@
-﻿using Eva.Commons.Util;
+﻿using System.Text.RegularExpressions;
+using Eva.Commons.Util;
 using Microsoft.Extensions.Logging;
 
 namespace Eva.Commons.System;
@@ -17,7 +18,7 @@ public class EvaSystem
         if(!typeof(TSingleton).IsAssignableTo(inter)) throw new ArgumentException("The type " + inter.Name + " must be an interface of " + typeSingleton.Name);
         if(_singletons.ContainsKey(inter)) throw new ArgumentException("The singleton " + inter.Name + " is already registered");
         
-        logger.LogInformation("Loading " + typeSingleton.Name +"...");
+        logger.LogInformation("Initializating " + typeSingleton.Name.SplitSingletonName() +"...");
         
         var instance = (TSingleton)Activator.CreateInstance(typeof(TSingleton), args)!;
         _singletons[typeof(TInterface)] = (IDisposable)instance;
