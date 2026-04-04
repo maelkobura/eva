@@ -20,7 +20,7 @@ public class NodeEntity {
         Address = address;
     }
 
-    public bool IsExpirated()
+    public virtual bool IsExpirated()
     {
         return NodeTrustCertificate == null || NodeTrustCertificate.Payload.Content.Expiration < DateTimeOffset.UtcNow.ToUnixTimeSeconds();
     }
@@ -32,7 +32,7 @@ public class NodeEntity {
     
     public FunctionPanel? FunctionPanel { get; private set; }
 
-    public async Task RefreshPanelAsync()
+    public virtual async Task RefreshPanelAsync()
     {
         using var http = HTTP.CreateHttpClient(out var secure);
         http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Convert.ToBase64String(NodeTrustCertificate!.ToByteArray()));
