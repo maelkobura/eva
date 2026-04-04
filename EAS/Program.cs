@@ -8,6 +8,7 @@ using Eva.AuthorityServer.Security.TLS;
 using Eva.AuthorityServer.Server;
 using Eva.AuthorityServer.System;
 using Eva.AuthorityServer.User;
+using Eva.Commons.System;
 using Eva.Commons.Util;
 using Microsoft.Extensions.Logging;
 using Mono.Options;
@@ -56,11 +57,11 @@ class Program
         CertificateManager.Init(KeysManager.PublicKeyBase64, KeysManager.PrivateKeyBase64);
         NodeRegistry.Init(nodeDir);
         //PermissionsManager
-        AuthorityServerManager.Init();
+        EvaSystem.AddSingleton<InternalAuthorityServerManager, IAuthorityServerManager>();
         CAManager.Init();
         CAManager.Instance!.GenerateCA();
         
-        AuthorityServerManager.Start();
+        EvaSystem.Singleton<IAuthorityServerManager>().Start();
         Console.ReadKey(true);
     }
 }

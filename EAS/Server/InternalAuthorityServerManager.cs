@@ -13,20 +13,13 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Eva.AuthorityServer.Server;
 
-public class AuthorityServerManager
-{
-    private static ILogger logger = EvaLogger.CreateLogger<AuthorityServerManager>();
-    
-    public static bool IsInitialized { get; private set; } = false;
-    private static AuthentificationMiddleware authMiddleware;
+public class InternalAuthorityServerManager : IAuthorityServerManager {
+    private static ILogger logger = EvaLogger.CreateLogger<InternalAuthorityServerManager>();
 
-    private static WebServer server;
+    private WebServer server;
     
-    public static void Init()
+    public InternalAuthorityServerManager()
     {
-        if (IsInitialized) return;
-        logger.LogInformation("Initializing AuthorityServerManager...");
-
         Swan.Logging.Logger.NoLogging();
 
         server = new WebServer(o => o
@@ -38,13 +31,16 @@ public class AuthorityServerManager
             .WithWebApi("/user/auth", o => o.WithController<UserAuthentificationController>())
             .WithWebApi("/", o => o.WithController<RootController>());
         
-        
-        IsInitialized = true;
     }
 
-    public static void Start()
+    public void Start()
     {
         server.Start();
         logger.LogInformation("Server started on {}", server.Options.UrlPrefixes[0]);
+    }
+
+    public void Dispose()
+    {
+        //TODO Server stop
     }
 }
