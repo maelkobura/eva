@@ -46,7 +46,7 @@ log.LogInformation("Service Author: {Author}", description.Author);
 log.LogInformation("Service License: {License}", description.License);
 log.LogInformation("Service Authorization Count: {Count} authorizations", description.Authorization?.Length ?? 0);
 
-AuthorityClient.Init(
+EvaSystem.AddSingleton<IAuthorityClient, InternalAuthorityClient>(
     Configuration.Content.GetSection("eas:main").Get<AuthorityConnectionInfo>(), 
     Configuration.Content.GetSection("eas:backup").Get<AuthorityConnectionInfo>());
 

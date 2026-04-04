@@ -4,6 +4,7 @@ using System.Text.Json.Nodes;
 using Eva.AuthorityServer.System;
 using Eva.Commons.Security;
 using Eva.Commons.Security.Certificate;
+using Eva.Commons.System;
 using Eva.Commons.Util;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -53,7 +54,7 @@ public class CertificateManager
         
         string json = JsonConvert.SerializeObject(new { service = serviceName, token, publickey = userPublicKey });
         HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
-        var response = AuthorityClient.Instance!.SendPostRequest("/node/auth", content).Result;
+        var response = EvaSystem.Singleton<IAuthorityClient>().SendPostRequest("/node/auth", content).Result;
         response.EnsureSuccessStatusCode();
         var responseJson = JObject.Parse(response.Content.ReadAsStringAsync().Result) ?? throw new Exception("EAS response is empty");
         CertificateRaw = (string)responseJson["cert"]! ?? throw new Exception("Certificate not found in response");
@@ -62,7 +63,7 @@ public class CertificateManager
         
         EasCertificateRaw = (string)responseJson["eas"]! ?? throw new Exception("EAS certificate not found in response");
         EasCertificateUnit = CertificateUtil.ParseCertificateBase64(EasCertificateRaw) ?? throw new Exception("EAS certificate parsing failed");
-        AuthorityClient.Instance.EasCertificate = EasCertificateRaw;
+        EvaSystem.Singleton<IAuthorityClient>().EasCertificate = EasCertificateRaw;
         
         CertificateUnit = CertificateUtil.ParseCertificateBase64(CertificateRaw) ?? throw new Exception("Certificate parsing failed");
 
@@ -82,7 +83,7 @@ public class CertificateManager
             logger.LogInformation("Refreshing TLS certificate...");
         }
         
-        var response = AuthorityClient.Instance!.SendGetRequest("/node/auth/tls").Result;
+        var response = EvaSystem.Singleton<IAuthorityClient>().SendGetRequest("/node/auth/tls").Result;
         response.EnsureSuccessStatusCode();
         var responseJson = JObject.Parse(response.Content.ReadAsStringAsync().Result) ?? throw new Exception("EAS response is empty");
         

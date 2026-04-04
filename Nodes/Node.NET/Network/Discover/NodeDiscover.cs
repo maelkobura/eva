@@ -1,4 +1,5 @@
 ﻿using Eva.Commons.Security.Certificate;
+using Eva.Commons.System;
 using Eva.Commons.Util;
 using Eva.Node.Authority;
 using Eva.Node.Authority.Certificate;
@@ -68,7 +69,7 @@ public class NodeDiscover
 
     private Dictionary<string, string> GetNodesFromTracker()
     {
-        var response = AuthorityClient.Instance!.SendGetRequest("/nodes").Result;
+        var response = EvaSystem.Singleton<IAuthorityClient>().SendGetRequest("/nodes").Result;
         response.EnsureSuccessStatusCode();
         var content = response.Content.ReadAsStringAsync().Result;
         if(string.IsNullOrEmpty(content)) throw new Exception("No EAS response");
