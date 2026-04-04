@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Eva.Commons.Util;
 using Eva.Commons.Messages;
 using Google.Protobuf.Collections;
@@ -6,18 +6,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Eva.Node.Service.Functions;
 
-public class FunctionRegistry
+public class InternalFunctionRegistry : IFunctionRegistry
 {
-    public static FunctionRegistry? Instance { get; private set; }
-    private static ILogger logger = EvaLogger.CreateLogger<FunctionRegistry>();
+    private static ILogger logger = EvaLogger.CreateLogger<InternalFunctionRegistry>();
     
     private readonly Dictionary<string, FunctionDescriptor> _functions = new();
-
-    public static void Init()
-    {
-        if (Instance != null) return;
-        Instance = new FunctionRegistry();
-    }
     
     public void RegisterObjectMethod(object target, MethodInfo method, EvaFunctionAttribute attr)
     {
@@ -157,5 +150,9 @@ public class FunctionRegistry
         return new FunctionExecutor(descriptor, skipAuthorization);
     }
     
+    public void Dispose()
+    {
+        _functions.Clear();
+        GC.SuppressFinalize(this);
+    }
 }
-    

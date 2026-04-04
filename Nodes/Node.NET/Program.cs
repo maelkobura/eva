@@ -61,7 +61,7 @@ EvaSystem.AddSingleton<INetworkManager, InternalNetworkManager>();
 EvaSystem.Singleton<INetworkManager>().Start();
 EvaSystem.Singleton<INodeDiscover>().Discover(true);
 
-FunctionRegistry.Init();
+EvaSystem.AddSingleton<IFunctionRegistry, InternalFunctionRegistry>();
 
 ServiceLoader.Init(description);
 ServiceLoader.Instance!.LoadService();

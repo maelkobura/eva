@@ -3,6 +3,7 @@ using EmbedIO.Routing;
 using EmbedIO.WebApi;
 using Eva.Commons.Messages;
 using Eva.Commons.Security.Certificate;
+using Eva.Commons.System;
 using Eva.Node.Service.Functions;
 using Google.Protobuf;
 
@@ -13,7 +14,7 @@ public class FunctionsController : WebApiController{
     [Route(HttpVerbs.Get, "/")]
     public async Task GetFunctions()
     {
-        var panel = FunctionRegistry.Instance.GetPanel();
+        var panel = EvaSystem.Singleton<IFunctionRegistry>().GetPanel();
         var bytes = panel.ToByteArray();
         HttpContext.Response.ContentType = "application/x-protobuf";
         HttpContext.Response.ContentLength64 = bytes.Length;
@@ -23,7 +24,7 @@ public class FunctionsController : WebApiController{
     [Route(HttpVerbs.Get, "/{name}")]
     public async Task GetFunction(string name)
     {
-        var reg = FunctionRegistry.Instance!;
+        var reg = EvaSystem.Singleton<IFunctionRegistry>();
         var func = reg.Get(name);
         if(func == null) throw new Exception("Function not found");
         var responseBytes = reg.GetDescriptor(func).ToByteArray();
@@ -45,7 +46,7 @@ public class FunctionsController : WebApiController{
         var cert = HttpContext.GetItem<Certificate>("certificate");
 
         // Create executor
-        var executor = FunctionRegistry.Instance.CreateExecutor(name);
+        var executor = EvaSystem.Singleton<IFunctionRegistry>().CreateExecutor(name);
         if (executor is null)
         {
             await HttpContext.SendStandardHtmlAsync(404);

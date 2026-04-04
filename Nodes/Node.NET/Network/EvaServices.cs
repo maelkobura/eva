@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Eva.Commons.Messages;
 using Eva.Commons.Security;
 using Eva.Commons.Security.Certificate;
@@ -27,7 +27,7 @@ public static class EvaServices
         // Loopback
         if (nodeId == ServiceLoader.Instance!.Description!.Name)
         {
-            var localDescriptor = FunctionRegistry.Instance.Get(functionName);
+            var localDescriptor = EvaSystem.Singleton<IFunctionRegistry>().Get(functionName);
             if (localDescriptor is null)
                 throw new Exception($"Function '{functionName}' not found locally");
 

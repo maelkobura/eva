@@ -45,7 +45,7 @@ public class ServiceLoader
         foreach (var method in methods)
         {
             var attr = method.GetCustomAttribute<EvaFunctionAttribute>()!;
-            FunctionRegistry.Instance!.RegisterObjectMethod(service, method, attr);
+            EvaSystem.Singleton<IFunctionRegistry>().RegisterObjectMethod(service, method, attr);
         }
         
         
