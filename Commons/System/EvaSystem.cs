@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Eva.Commons.Util;
 using Microsoft.Extensions.Logging;
 
@@ -24,6 +24,16 @@ public class EvaSystem
         _singletons[typeof(TInterface)] = (IDisposable)instance;
         return instance;
     }
+
+#if DEBUG
+    public static TInterface AddSingleton<TInterface>(TInterface instance) where TInterface : class, IDisposable
+    {
+        Type inter = typeof(TInterface);
+        if (_singletons.ContainsKey(inter)) throw new ArgumentException("The singleton " + inter.Name + " is already registered");
+        _singletons[inter] = (IDisposable)instance;
+        return instance;
+    }
+#endif
     
     public static TInterface Singleton<TInterface>() where TInterface : class {
         if(!_singletons.ContainsKey(typeof(TInterface))) throw new ArgumentException("The singleton " + typeof(TInterface).Name + " is not registered");
