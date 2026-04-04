@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+using System;
+using System.Linq;
+using System.Reflection;
 using Eva.Commons.System;
 using Eva.Commons.Util;
 using Eva.Node.Loader;
@@ -7,21 +9,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Eva.Node.Service;
 
-public class ServiceLoader
+public class InternalServiceLoader : IServiceLoader
 {
-    public static ServiceLoader? Instance { get; private set; }
-    private static ILogger logger = EvaLogger.CreateLogger<ServiceLoader>();
+    private static ILogger logger = EvaLogger.CreateLogger<InternalServiceLoader>();
     private EvaService? service;
     
     public ServiceDescription? Description { get; private set; }
-    
-    public static void Init(ServiceDescription description)
-    {
-        if (Instance != null) return;
-        Instance = new ServiceLoader(description);
-    }
 
-    public ServiceLoader(ServiceDescription description)
+    public InternalServiceLoader(ServiceDescription description)
     {
         Description = description;
     }
@@ -53,5 +48,10 @@ public class ServiceLoader
         service.Initialize();
         
         return service;
+    }
+    
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
     }
 }

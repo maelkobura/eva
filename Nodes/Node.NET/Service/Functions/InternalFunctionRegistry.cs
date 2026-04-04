@@ -1,6 +1,7 @@
 using System.Reflection;
 using Eva.Commons.Util;
 using Eva.Commons.Messages;
+using Eva.Commons.System;
 using Google.Protobuf.Collections;
 using Microsoft.Extensions.Logging;
 
@@ -135,7 +136,7 @@ public class InternalFunctionRegistry : IFunctionRegistry
     {
         var panel = new FunctionPanel
         {
-            ServiceId = ServiceLoader.Instance!.Description!.Name,
+            ServiceId = EvaSystem.Singleton<IServiceLoader>().Description!.Name,
         };
 
         panel.Functions.Add(_functions.Values.Select(GetDescriptor));

@@ -63,8 +63,8 @@ EvaSystem.Singleton<INodeDiscover>().Discover(true);
 
 EvaSystem.AddSingleton<IFunctionRegistry, InternalFunctionRegistry>();
 
-ServiceLoader.Init(description);
-ServiceLoader.Instance!.LoadService();
+EvaSystem.AddSingleton<IServiceLoader, InternalServiceLoader>(description);
+EvaSystem.Singleton<IServiceLoader>().LoadService();
 
 Console.ReadKey(true);
 

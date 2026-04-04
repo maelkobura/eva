@@ -38,7 +38,7 @@ public class TerminalSession : IDisposable{
         {
             BuildServiceObject(node);
         }
-        BuildServiceObject(ServiceLoader.Instance!.Description!.Name, EvaSystem.Singleton<IFunctionRegistry>()!.GetPanel()); //Own service
+        BuildServiceObject(EvaSystem.Singleton<IServiceLoader>().Description!.Name, EvaSystem.Singleton<IFunctionRegistry>()!.GetPanel()); //Own service
     }
 
     private void BuildServiceObject(NodeEntity service)

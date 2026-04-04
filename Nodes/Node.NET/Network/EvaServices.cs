@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Eva.Commons.Messages;
 using Eva.Commons.Security;
 using Eva.Commons.Security.Certificate;
@@ -25,7 +25,7 @@ public static class EvaServices
         var node = EvaSystem.Singleton<INetworkNodeManager>().Nodes.FirstOrDefault(n => n.Name == nodeId);
         
         // Loopback
-        if (nodeId == ServiceLoader.Instance!.Description!.Name)
+        if (nodeId == EvaSystem.Singleton<IServiceLoader>().Description!.Name)
         {
             var localDescriptor = EvaSystem.Singleton<IFunctionRegistry>().Get(functionName);
             if (localDescriptor is null)
