@@ -9,6 +9,7 @@ using Eva.Node.Loader;
 using Eva.Node.Network;
 using Eva.Node.Network.Discover;
 using Eva.Node.Service;
+using Eva.Node.Service.Calling;
 using Eva.Node.Service.Functions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -62,6 +63,8 @@ EvaSystem.Singleton<INetworkManager>().Start();
 EvaSystem.Singleton<INodeDiscover>().Discover(true);
 
 EvaSystem.AddSingleton<IFunctionRegistry, InternalFunctionRegistry>();
+
+EvaSystem.AddSingleton<IServiceRouter, InternalServiceRouter>();
 
 EvaSystem.AddSingleton<IServiceLoader, InternalServiceLoader>(description);
 EvaSystem.Singleton<IServiceLoader>().LoadService();
