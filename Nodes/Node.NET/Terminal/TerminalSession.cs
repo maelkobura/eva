@@ -19,6 +19,7 @@ public class TerminalSession : IDisposable{
     
     public TerminalSession(Certificate cert)
     {
+        _currentCert = cert;
         _engine = new Engine(opts => opts
             .LimitRecursion(16)
             .TimeoutInterval(TimeSpan.FromSeconds(30))
@@ -38,7 +39,12 @@ public class TerminalSession : IDisposable{
         {
             BuildServiceObject(node);
         }
-        BuildServiceObject(EvaSystem.Singleton<IServiceLoader>().Description!.Name, EvaSystem.Singleton<IFunctionRegistry>()!.GetPanel()); //Own service
+        
+        var description = EvaSystem.Singleton<IServiceLoader>().Description;
+        if (description != null)
+        {
+            BuildServiceObject(description.Name, EvaSystem.Singleton<IFunctionRegistry>()!.GetPanel()); //Own service
+        }
     }
 
     private void BuildServiceObject(NodeEntity service)
