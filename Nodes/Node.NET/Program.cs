@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 using Eva.AuthorityServer.System;
+using Eva.Commons.System;
 using Eva.Commons.Util;
 using Eva.Node.Authority;
 using Eva.Node.Authority.Certificate;
@@ -56,8 +57,8 @@ CertificateManager.Instance.GenerateTlsCertificate();
 NodeDiscover.Init(description);
 NetworkNodeManager.Init();
 
-NetworkManager.Init();
-NetworkManager.Instance.Start();
+EvaSystem.AddSingleton<INetworkManager, InternalNetworkManager>();
+EvaSystem.Singleton<INetworkManager>().Start();
 NodeDiscover.Instance!.Discover(true);
 
 FunctionRegistry.Init();

@@ -8,32 +8,25 @@ using Microsoft.Extensions.Logging;
 
 namespace Eva.Node.Network;
 
-public class NetworkManager
+public class InternalNetworkManager : INetworkManager
 {
-    public static NetworkManager? Instance { get; private set; }
-    private static ILogger logger = EvaLogger.CreateLogger<NetworkManager>();
-    
-    private WebServer server;
+    private static readonly ILogger logger = EvaLogger.CreateLogger<InternalNetworkManager>();
 
-    public static void Init()
-    {
-        if (Instance != null) return;
-        Instance = new NetworkManager();
-    }
+    private readonly WebServer _server;
 
-    public NetworkManager()
+    // === Conserver exactement le constructeur tel quel ===
+    public InternalNetworkManager()
     {
         bool enableTls = Configuration.Content["debug:skip-tls"] != "true";
-        
-        if(!enableTls)
+
+        if (!enableTls)
         {
             logger.LogWarning("TLS Server is disabled. Be careful to activate in production environment");
         }
-        
+
         Swan.Logging.Logger.NoLogging();
-        server = new WebServer(o => o
-                .WithUrlPrefix(
-                    $"http{(!enableTls ? "" : "s")}://localhost:{Configuration.Content["network:self:port"]}/")
+        _server = new WebServer(o => o
+                .WithUrlPrefix($"http{(!enableTls ? "" : "s")}://localhost:{Configuration.Content["network:self:port"]}/")
                 .WithMode(HttpListenerMode.EmbedIO)
                 .WithCertificate(!enableTls ? null : CertificateManager.Instance.TlsNodeCertificate))
             .WithLocalSessionManager()
@@ -44,7 +37,18 @@ public class NetworkManager
 
     public void Start()
     {
-        server.Start();
-        logger.LogInformation("Server started on {}", server.Options.UrlPrefixes[0]);
+        _server.Start();
+        logger.LogInformation("Server started on {Url}", _server.Options.UrlPrefixes[0]);
+    }
+
+    public void Stop()
+    {
+        _server.Dispose();
+        logger.LogInformation("Server stopped");
+    }
+
+    public void Dispose()
+    {
+        Stop();
     }
 }
