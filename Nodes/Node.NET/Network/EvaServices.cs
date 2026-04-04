@@ -1,11 +1,16 @@
 ﻿using System.Text;
+using Eva.Commons.Messages;
+using Eva.Commons.Security;
 using Eva.Commons.Security.Certificate;
+using Eva.Node.Service;
+using Eva.Node.Service.Functions;
 using Google.Protobuf;
 
 namespace Eva.Node.Network;
 
 public static class EvaServices
 {
+    
     // Full call with explicit cert
     public static async Task<T> Call<T>(string fullName, Certificate cert, params object?[] parameters)
     {
@@ -17,13 +22,40 @@ public static class EvaServices
         var functionName = fullName[(lastDot + 1)..];
 
         var node = NetworkNodeManager.Instance!.Nodes.FirstOrDefault(n => n.Name == nodeId);
+        
+        // Loopback
+        if (nodeId == ServiceLoader.Instance!.Description!.Name)
+        {
+            var localDescriptor = FunctionRegistry.Instance.Get(functionName);
+            if (localDescriptor is null)
+                throw new Exception($"Function '{functionName}' not found locally");
+
+            var executor = new FunctionExecutor(localDescriptor, skipAuthorization: true);
+            var loopbackRequest = new InvokeRequest { CallerId = cert.Payload.Content.Subject };
+            // sérialise quand même les params pour rester cohérent
+            for (int i = 0; i < localDescriptor.Parameters.Length; i++)
+            {
+                if (i >= parameters.Length) break;
+                if (parameters[i] is null) continue;
+                loopbackRequest.Parameters[localDescriptor.Parameters[i].Name] =
+                    ByteString.CopyFrom(SerializeParameter(parameters[i]!));
+            }
+
+            var loopbackResponse = await executor.ExecuteAsync(loopbackRequest, cert);
+            if (!loopbackResponse.Success)
+                throw new Exception(loopbackResponse.Error);
+
+            return DeserializeResult<T>(loopbackResponse.Result.ToByteArray());
+        }
+
         if (node is null)
             throw new Exception($"Node '{nodeId}' not found");
 
         var descriptor = node.GetFunction(functionName);
         if (descriptor is null)
             throw new Exception($"Function '{functionName}' not found on node '{nodeId}'");
-
+        
+        
         var serialized = new Dictionary<string, ByteString>();
         for (int i = 0; i < descriptor.Parameters.Count; i++)
         {
