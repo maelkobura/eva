@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using Eva.Commons.Messages;
 using Eva.Commons.Security.Certificate;
 using Google.Protobuf;
@@ -45,12 +45,12 @@ public class NodeEntity {
         FunctionPanel = FunctionPanel.Parser.ParseFrom(bytes);
     }
 
-    public EvaFunctionDescriptor? GetFunction(string name)
+    public virtual EvaFunctionDescriptor? GetFunction(string name)
     {
         return FunctionPanel?.Functions.FirstOrDefault(f => f.Name == name);
     }
     
-    public async Task<InvokeResponse> InvokeAsync(string functionName, Dictionary<string, ByteString> parameters, Certificate? callerCert)
+    public virtual async Task<InvokeResponse> InvokeAsync(string functionName, Dictionary<string, ByteString> parameters, Certificate? callerCert)
     {
         var function = GetFunction(functionName);
         if (function is null)
