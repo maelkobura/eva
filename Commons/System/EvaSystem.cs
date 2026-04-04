@@ -10,7 +10,7 @@ public class EvaSystem
     
     private static readonly Dictionary<Type, IDisposable> _singletons = new();
 
-    public static TSingleton AddSingleton<TInterface, TSingleton>(object[] args) where TInterface : IDisposable where TSingleton : TInterface{
+    public static TSingleton AddSingleton<TInterface, TSingleton>(params object[]? args) where TSingleton : class where TInterface : IDisposable{
         Type inter = typeof(TInterface);
         Type typeSingleton = typeof(TSingleton);
         
@@ -20,7 +20,7 @@ public class EvaSystem
         logger.LogInformation("Loading " + typeSingleton.Name +"...");
         
         var instance = (TSingleton)Activator.CreateInstance(typeof(TSingleton), args)!;
-        _singletons[typeof(TInterface)] = instance;
+        _singletons[typeof(TInterface)] = (IDisposable)instance;
         return instance;
     }
     
