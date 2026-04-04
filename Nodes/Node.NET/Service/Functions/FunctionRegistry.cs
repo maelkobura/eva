@@ -142,7 +142,7 @@ public class FunctionRegistry
     {
         var panel = new FunctionPanel
         {
-            ServiceId = ServiceLoader.Instance!.ServiceId.ToSnakeCase(),
+            ServiceId = ServiceLoader.Instance!.Description!.Name,
         };
 
         panel.Functions.Add(_functions.Values.Select(GetDescriptor));
