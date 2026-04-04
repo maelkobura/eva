@@ -51,13 +51,13 @@ class Program
         
         using var templateStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Eva.AuthorityServer.config.default.yml");
         Configuration.Init(configPath, configOverride, templateStream);
-        
-        KeysManager.Init();
+
+        EvaSystem.AddSingleton<IKeysManager,InternalKeysManager>();
         UserAuthenticator.Init();
-        CertificateManager.Init(KeysManager.PublicKeyBase64, KeysManager.PrivateKeyBase64);
+        CertificateManager.Init(EvaSystem.Singleton<IKeysManager>().PublicKeyBase64, EvaSystem.Singleton<IKeysManager>().PrivateKeyBase64);
         NodeRegistry.Init(nodeDir);
         //PermissionsManager
-        EvaSystem.AddSingleton<InternalAuthorityServerManager, IAuthorityServerManager>();
+        EvaSystem.AddSingleton<IAuthorityServerManager, InternalAuthorityServerManager>();
         CAManager.Init();
         CAManager.Instance!.GenerateCA();
         

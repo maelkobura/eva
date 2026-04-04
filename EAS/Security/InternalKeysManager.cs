@@ -6,28 +6,23 @@ using NSec.Cryptography;
 
 namespace Eva.AuthorityServer.Security;
 
-public class KeysManager
-{
-    private static ILogger logger = EvaLogger.CreateLogger<KeysManager>();
+public class InternalKeysManager : IKeysManager{
+    private static ILogger logger = EvaLogger.CreateLogger<InternalKeysManager>();
 
-    public static string PrivateKeyBase64 { get; private set; }
-    public static string PublicKeyBase64 { get; private set; }
-    
-    public static bool IsInitialized { get; private set; } = false;
-    
-    public static void Init()
+    public string PrivateKeyBase64 { get; private set; }
+    public string PublicKeyBase64 { get; private set; }
+
+    public InternalKeysManager()
     {
-        if (IsInitialized) return;
         logger.LogInformation("Initializing KeysManager...");
         GenerateKeys();
         logger.LogInformation("Public key: {}", 
             PublicKeyBase64);
         logger.LogInformation("Private key: {}", 
             Boolean.Parse(Configuration.Content["security:keys:showPrivateKey"] ?? "false") ? PrivateKeyBase64 : "hidden");
-        IsInitialized = true;
     }
 
-    private static void GenerateKeys()
+    private void GenerateKeys()
     {
         logger.LogInformation("Generating Keys...");
 
@@ -40,5 +35,5 @@ public class KeysManager
         
     }
     
-    
+    public void Dispose(){}
 }

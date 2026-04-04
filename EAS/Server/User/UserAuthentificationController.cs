@@ -7,6 +7,7 @@ using Eva.AuthorityServer.Security;
 using Eva.AuthorityServer.Security.Certificate;
 using Eva.AuthorityServer.User;
 using Eva.Commons.Security.Certificate;
+using Eva.Commons.System;
 using Eva.Commons.Util;
 using Google.Protobuf;
 using Newtonsoft.Json;
@@ -35,7 +36,7 @@ public class UserAuthentificationController : WebApiController {
             var cert = CertificateManager.GenerateCertificate(user, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600, publicKey);
             
             HttpContext.Response.StatusCode = 200;
-            return new {code=200, cert=cert.EntityCertificateUnit.ToByteString().ToBase64(), eas=cert.AuthorityCertificateUnit.ToByteString().ToBase64(), pub=KeysManager.PublicKeyBase64};
+            return new {code=200, cert=cert.EntityCertificateUnit.ToByteString().ToBase64(), eas=cert.AuthorityCertificateUnit.ToByteString().ToBase64(), pub=EvaSystem.Singleton<IKeysManager>().PublicKeyBase64};
         }
         catch (Exception e)
         {
@@ -51,7 +52,7 @@ public class UserAuthentificationController : WebApiController {
         {
             var body = ConnectionUtil.GetCertificate(HttpContext);
             var cert = CertificateUtil.ParseCertificateBase64(body);
-            if (!CertificateUtil.CheckCertificate(cert, KeysManager.PublicKeyBase64))
+            if (!CertificateUtil.CheckCertificate(cert, EvaSystem.Singleton<IKeysManager>().PublicKeyBase64))
             {
                 throw new Exception("Invalid token or expirated");
             }

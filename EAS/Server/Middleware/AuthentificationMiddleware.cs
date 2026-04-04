@@ -4,6 +4,7 @@ using Eva.AuthorityServer.Security;
 using Eva.AuthorityServer.Security.Certificate;
 using Eva.AuthorityServer.System;
 using Eva.Commons.Security.Certificate;
+using Eva.Commons.System;
 using Eva.Commons.Util;
 using Newtonsoft.Json;
 
@@ -32,7 +33,7 @@ public class AuthentificationMiddleware : WebModuleBase{
             } else {
                 var certRaw = ConnectionUtil.GetCertificate(ctx);
                 var cert = CertificateUtil.ParseCertificateBase64(certRaw);
-                if (!CertificateUtil.CheckCertificate(cert, KeysManager.PublicKeyBase64))
+                if (!CertificateUtil.CheckCertificate(cert, EvaSystem.Singleton<IKeysManager>().PublicKeyBase64))
                 {
                     throw new Exception("Invalid token or expirated");
                 }
