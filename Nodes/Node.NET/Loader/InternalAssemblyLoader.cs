@@ -1,39 +1,35 @@
-﻿using System.Reflection;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using Eva.Node.Service;
 
 namespace Eva.Node.Loader;
 
-public class AssemblyLoader
+public class InternalAssemblyLoader : IAssemblyLoader
 {
-    public static AssemblyLoader? Instance { get; private set; }
-    
-    private Assembly? assembly;
-    private ServiceDescription? serviceDescription;
+    private readonly Assembly _assembly;
+    private ServiceDescription? _serviceDescription;
+
     public string NodeAssemblyPath { get; }
 
-    public static void Init(string nodeAssemblyPath)
-    {
-        if (Instance != null) return;
-        Instance = new AssemblyLoader(nodeAssemblyPath);
-    }
-    
-    public AssemblyLoader(string nodeAssemblyPath)
+    public InternalAssemblyLoader(string nodeAssemblyPath)
     {
         NodeAssemblyPath = nodeAssemblyPath;
-        assembly = Assembly.LoadFrom(nodeAssemblyPath);
+        _assembly = Assembly.LoadFrom(nodeAssemblyPath);
     }
 
     public ServiceDescription LoadDescription()
     {
-        if(serviceDescription is not null) return serviceDescription;
-        if(assembly == null) throw new Exception("Assembly not loaded");
-        var metadata = assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
+        if (_serviceDescription != null) return _serviceDescription;
+
+        var metadata = _assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
             .ToDictionary(a => a.Key, a => a.Value);
 
         string[]? authorization = null;
         if (metadata.TryGetValue("Authorization", out var authResourceName))
         {
-            using var stream = assembly.GetManifestResourceStream(authResourceName);
+            using var stream = _assembly.GetManifestResourceStream(authResourceName);
             if (stream != null)
             {
                 using var reader = new StreamReader(stream);
@@ -43,7 +39,7 @@ public class AssemblyLoader
             }
         }
 
-        return serviceDescription = new ServiceDescription(
+        _serviceDescription = new ServiceDescription(
             Name: metadata.GetValueOrDefault("Name") ?? "",
             Authorization: authorization,
             Class: metadata.GetValueOrDefault("Class") ?? "",
@@ -53,13 +49,16 @@ public class AssemblyLoader
             Author: metadata.GetValueOrDefault("Author") ?? "No author",
             License: metadata.GetValueOrDefault("License") ?? "No license"
         );
+
+        return _serviceDescription;
     }
 
     public Type GetMainType()
     {
-        if(assembly == null) throw new Exception("Assembly not loaded");
-        if(serviceDescription is null) throw new Exception("Service description not loaded");
-        return assembly.GetType(serviceDescription.Class);
+        if (_serviceDescription == null) throw new Exception("Service description not loaded");
+        return _assembly.GetType(_serviceDescription.Class);
     }
-    
+
+    public void Dispose()
+    {}
 }

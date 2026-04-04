@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Eva.Commons.System;
 using Eva.Commons.Util;
 using Eva.Node.Loader;
 using Eva.Node.Service.Functions;
@@ -28,7 +29,7 @@ public class ServiceLoader
     public EvaService LoadService()
     {
         if (service is not null) return service;
-        Type type = AssemblyLoader.Instance!.GetMainType();
+        Type type = EvaSystem.Singleton<IAssemblyLoader>().GetMainType();
         if(type is null) throw new Exception("Unable to get service from classpath");
         if (!type.GetInterfaces().Contains(typeof(EvaService))) throw new Exception("Main type is not a subclass of EvaService");
         

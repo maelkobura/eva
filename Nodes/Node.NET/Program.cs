@@ -38,8 +38,8 @@ using var templateStream = Assembly.GetExecutingAssembly().GetManifestResourceSt
 
 Configuration.Init(nodeConfigPath, configOverride, templateStream);
 
-AssemblyLoader.Init(serviceBinaryPath);
-var description = AssemblyLoader.Instance!.LoadDescription();
+EvaSystem.AddSingleton<IAssemblyLoader, InternalAssemblyLoader>(serviceBinaryPath);
+var description = EvaSystem.Singleton<IAssemblyLoader>().LoadDescription();
 log.LogInformation("Service Information: {DisplayName} ({Name}) - Ver {Version}", description.DisplayName, description.Name, description.Version);
 log.LogInformation("Service Description: {Description}", description.Description);
 log.LogInformation("Service Author: {Author}", description.Author);
