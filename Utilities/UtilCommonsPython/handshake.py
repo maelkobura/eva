@@ -5,8 +5,8 @@ import base64
 import websockets
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
-from pyprotos.Messages import Handshake_pb2
-from pyprotos.Security.Certificate import Certificate_pb2
+from pyprotos import Handshake_pb2
+from pyprotos import Certificate_pb2
 
 
 def _sign_int(value: int, private_key_base64: str) -> bytes:

@@ -1,5 +1,7 @@
 ﻿syntax = "proto3";
 
+package eva.messages;
+
 option csharp_namespace = "Eva.Commons.Security.Certificate";
 
 enum Version {

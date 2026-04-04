@@ -7,32 +7,30 @@ using Microsoft.Extensions.Logging;
 
 namespace Eva.Node.Terminal;
 
-public class TerminalManager
-{
-    public static TerminalManager? Instance { get; private set; }
-    private static ILogger logger = EvaLogger.CreateLogger<TerminalManager>();
+public class InternalTerminalManager : ITerminalManager{
+    private static ILogger logger = EvaLogger.CreateLogger<InternalTerminalManager>();
 
-    public static void Init()
-    {
-        if (Instance != null) return;
-        Instance = new TerminalManager();
-    }
+    private readonly Dictionary<string, TerminalSession> _sessions = new();
 
-    private static readonly Dictionary<string, TerminalSession> _sessions = new();
-
-    public static TerminalSession CreateSession(string sessionId)
+    public TerminalSession CreateSession(string sessionId)
     {
         var session = new TerminalSession(EvaSystem.Singleton<ICertificateManager>().CertificateUnit!);
         _sessions[sessionId] = session;
         return session;
     }
 
-    public static TerminalSession? GetSession(string sessionId)
+    public TerminalSession? GetSession(string sessionId)
         => _sessions.TryGetValue(sessionId, out var s) ? s : null;
 
-    public static void CloseSession(string sessionId)
+    public void CloseSession(string sessionId)
     {
         if (_sessions.Remove(sessionId, out var session))
             session.Dispose();
+    }
+
+    public void Dispose()
+    {
+        foreach (var session in _sessions.Keys)
+            CloseSession(session);
     }
 }

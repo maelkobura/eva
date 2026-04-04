@@ -1,18 +1,26 @@
 ﻿syntax = "proto3";
-//import "Certificate.proto";
-//import "Functions.proto";
+
+package eva.messages;
+
+import "Certificate.proto";
+import "Functions.proto";
 
 option csharp_namespace = "Eva.Commons.Messages";
 
 message TerminalMessage {
   oneof payload {
-    //TerminalCommand command = 1;
+    TerminalCommand command = 1;
     string log = 2;
-    //ReturnType return_value = 3;
+    TerminalResponse returns = 3;
   }
+}
+
+message TerminalResponse {
+  ReturnType return_value = 1;
+  bytes value = 2;
 }
 
 message TerminalCommand {
   string command = 1;
-  //Certificate borrow_certificate = 2;
+  Certificate borrow_certificate = 2;
 }

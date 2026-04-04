@@ -28,8 +28,22 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Protobuf Include="Security\Certificate\Certificate.proto" />
-        <Protobuf Include="Messages\*.proto" />
+        <Protobuf Include="Messages\*.proto" ProtoRoot="Messages">
+            <GrpcServices>Both</GrpcServices>
+            <Access>Public</Access>
+            <ProtoCompile>True</ProtoCompile>
+            <CompileOutputs>True</CompileOutputs>
+            <OutputDir>obj\Debug\net9.0\</OutputDir>
+            <Generator>MSBuild:Compile</Generator>
+        </Protobuf>
+        <Protobuf Update="Messages\Certificate.proto" ProtoRoot="Messages">
+          <GrpcServices>Both</GrpcServices>
+          <Access>Public</Access>
+          <ProtoCompile>True</ProtoCompile>
+          <CompileOutputs>True</CompileOutputs>
+          <OutputDir>obj\Debug\net9.0\</OutputDir>
+          <Generator>MSBuild:Compile</Generator>
+        </Protobuf>
     </ItemGroup>
 
 </Project>

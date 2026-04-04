@@ -11,6 +11,7 @@ using Eva.Node.Network.Discover;
 using Eva.Node.Service;
 using Eva.Node.Service.Calling;
 using Eva.Node.Service.Functions;
+using Eva.Node.Terminal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Mono.Options;
@@ -65,6 +66,7 @@ EvaSystem.Singleton<INodeDiscover>().Discover(true);
 EvaSystem.AddSingleton<IFunctionRegistry, InternalFunctionRegistry>();
 
 EvaSystem.AddSingleton<IServiceRouter, InternalServiceRouter>();
+EvaSystem.AddSingleton<ITerminalManager, InternalTerminalManager>();
 
 EvaSystem.AddSingleton<IServiceLoader, InternalServiceLoader>(description);
 EvaSystem.Singleton<IServiceLoader>().LoadService();

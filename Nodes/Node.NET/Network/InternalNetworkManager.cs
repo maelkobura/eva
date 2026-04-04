@@ -5,6 +5,7 @@ using Eva.Commons.System;
 using Eva.Commons.Util;
 using Eva.Node.Authority.Certificate;
 using Eva.Node.Network.Middleware;
+using Eva.Node.Network.RemoteTerminal;
 using Microsoft.Extensions.Logging;
 
 namespace Eva.Node.Network;
@@ -33,6 +34,7 @@ public class InternalNetworkManager : INetworkManager
             .WithLocalSessionManager()
             .WithModule(new AuthentificationMiddleware("/"))
             .WithModule(new HandshakeRoute("/handshake", true))
+            .WithModule(new RemoteTerminalRoute("/terms", true))
             .WithWebApi("/funcs", o => o.WithController<FunctionsController>());
     }
 

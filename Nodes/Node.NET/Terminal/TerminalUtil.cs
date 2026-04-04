@@ -2,6 +2,7 @@
 using Eva.Commons.Messages;
 using Jint;
 using Jint.Native;
+using Jint.Runtime;
 
 namespace Eva.Node.Terminal;
 
@@ -18,6 +19,90 @@ public class TerminalUtil
         EvaType.Timestamp => DateTime.FromBinary((long)value.AsNumber()),
         _                 => value.ToString()
     };
+
+public static (ReturnType type, byte[] value) ConvertFromJavascript(JsValue value)
+{
+    if (value.IsArray())
+    {
+        var array = value.AsArray();
+        int length = (int)array.Length;
+
+        if (length == 0)
+        {
+            return (
+                new ReturnType
+                {
+                    Type = EvaType.Array,
+                    ArrayType = EvaType.String // fallback arbitraire
+                },
+                Array.Empty<byte>()
+            );
+        }
+
+        // Détection du type du premier élément
+        var (firstType, firstBytes) = ConvertFromJavascript(array.Get(0));
+
+        var buffer = new List<byte>();
+
+        for (int i = 0; i < length; i++)
+        {
+            var (elemType, elemBytes) = ConvertFromJavascript(array.Get(i));
+
+            // Sécurité : homogénéité
+            if (elemType.Type != firstType.Type)
+                throw new JavaScriptException("Array must be homogeneous");
+
+            // Préfixe longueur (int32)
+            buffer.AddRange(BitConverter.GetBytes(elemBytes.Length));
+            buffer.AddRange(elemBytes);
+        }
+
+        return (
+            new ReturnType
+            {
+                Type = EvaType.Array,
+                ArrayType = firstType.Type
+            },
+            buffer.ToArray()
+        );
+    }
+
+    // Cas non-array (ta version précédente)
+    return value.Type switch
+    {
+        Types.String => (
+            new ReturnType { Type = EvaType.String },
+            Encoding.UTF8.GetBytes(value.AsString())
+        ),
+
+        Types.Number => (
+            new ReturnType { Type = EvaType.Double },
+            BitConverter.GetBytes(value.AsNumber())
+        ),
+
+        Types.Boolean => (
+            new ReturnType { Type = EvaType.Boolean },
+            BitConverter.GetBytes(value.AsBoolean())
+        ),
+        
+
+        Types.Null => (
+            new ReturnType { Type = EvaType.String },
+            Array.Empty<byte>()
+        ),
+
+        Types.Undefined => (
+            new ReturnType { Type = EvaType.String },
+            Array.Empty<byte>()
+        ),
+
+        _ => (
+            new ReturnType { Type = EvaType.String },
+            Encoding.UTF8.GetBytes(value.ToString())
+        )
+    };
+}
+    
 
     public static JsValue ConvertToJavascript(byte[] bytes, EvaType type) => type switch
     {
