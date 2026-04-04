@@ -17,5 +17,9 @@
         <EmbeddedResource Include="node.default.yml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Jint" Version="4.7.0" />
+    </ItemGroup>
+
 
 </Project>
