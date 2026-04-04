@@ -54,7 +54,7 @@ class Program
 
         EvaSystem.AddSingleton<IKeysManager,InternalKeysManager>();
         EvaSystem.AddSingleton<IUserAuthenticator,InternalUserAuthenticator>();
-        CertificateManager.Init(EvaSystem.Singleton<IKeysManager>().PublicKeyBase64, EvaSystem.Singleton<IKeysManager>().PrivateKeyBase64);
+        EvaSystem.AddSingleton<ICertificateManager,InternalCertificateManager>(EvaSystem.Singleton<IKeysManager>().PublicKeyBase64, EvaSystem.Singleton<IKeysManager>().PrivateKeyBase64);
         NodeRegistry.Init(nodeDir);
         //PermissionsManager
         EvaSystem.AddSingleton<IAuthorityServerManager, InternalAuthorityServerManager>();

@@ -32,7 +32,7 @@ public class NodeAuthentificationController : WebApiController{
         try
         {
             var nodeContract = NodeRegistry.Instance.GetContractByNameAndValidate(serviceName, token);
-            var cert = CertificateManager.GenerateCertificate(nodeContract, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600, publicKey);
+            var cert = EvaSystem.Singleton<ICertificateManager>().GenerateCertificate(nodeContract, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600, publicKey);
             
             HttpContext.Response.StatusCode = 200;
             return new {code=200, cert=cert.EntityCertificateUnit.ToByteString().ToBase64(), eas=cert.AuthorityCertificateUnit.ToByteString().ToBase64(), pub=EvaSystem.Singleton<IKeysManager>().PublicKeyBase64};

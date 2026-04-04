@@ -15,24 +15,19 @@ using Version = Eva.Commons.Security.Certificate.Version;
 
 namespace Eva.AuthorityServer.Security.Certificate;
 
-public class CertificateManager
-{
-    private static ILogger logger = EvaLogger.CreateLogger<CertificateManager>();
-    
-    public static bool IsInitialized { get; private set; } = false;
+public class InternalCertificateManager : ICertificateManager{
+    private static ILogger logger = EvaLogger.CreateLogger<InternalCertificateManager>();
 
-    private static string publicKey;
-    private static string privateKey;
+    private string publicKey;
+    private string privateKey;
 
-    public static void Init(string publicKey, string privateKey)
+    public InternalCertificateManager(string publicKey, string privateKey)
     {
-        if (IsInitialized) return;
-        CertificateManager.publicKey = publicKey;
-        CertificateManager.privateKey = privateKey;
-        IsInitialized = true;
+       this.publicKey = publicKey;
+       this.privateKey = privateKey;
     }
     
-    public static CertificatePackage GenerateCertificate(object entity, long unixTime, string entityPublicKey)
+    public CertificatePackage GenerateCertificate(object entity, long unixTime, string entityPublicKey)
     {
         string subject;
         string[] roles;
@@ -86,5 +81,6 @@ public class CertificateManager
 
         return new CertificatePackage(entCert, easCert);
     }
-    
+
+    public void Dispose(){}
 }

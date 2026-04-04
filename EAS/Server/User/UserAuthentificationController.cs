@@ -33,7 +33,7 @@ public class UserAuthentificationController : WebApiController {
         try
         {
             var user = EvaSystem.Singleton<IUserAuthenticator>().Login(username, code);
-            var cert = CertificateManager.GenerateCertificate(user, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600, publicKey);
+            var cert = EvaSystem.Singleton<ICertificateManager>().GenerateCertificate(user, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600, publicKey);
             
             HttpContext.Response.StatusCode = 200;
             return new {code=200, cert=cert.EntityCertificateUnit.ToByteString().ToBase64(), eas=cert.AuthorityCertificateUnit.ToByteString().ToBase64(), pub=EvaSystem.Singleton<IKeysManager>().PublicKeyBase64};
