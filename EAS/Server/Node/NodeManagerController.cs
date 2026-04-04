@@ -3,6 +3,7 @@ using EmbedIO.Routing;
 using EmbedIO.WebApi;
 using Eva.AuthorityServer.Nodes;
 using Eva.Commons.Security.Certificate;
+using Eva.Commons.System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -40,7 +41,7 @@ public class NodeManagerController : WebApiController {
             {
                 throw new Exception("Invalid request");
             }
-            NodeRegistry.Instance?.CreateContract(name, auth, host, (int)port);
+            EvaSystem.Singleton<INodeRegistry>().CreateContract(name, auth, host, (int)port);
         }catch(Exception e)
         {
             HttpContext.Response.StatusCode = 500;

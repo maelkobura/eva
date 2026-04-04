@@ -31,7 +31,7 @@ public class NodeAuthentificationController : WebApiController{
 
         try
         {
-            var nodeContract = NodeRegistry.Instance.GetContractByNameAndValidate(serviceName, token);
+            var nodeContract = EvaSystem.Singleton<INodeRegistry>().GetContractByNameAndValidate(serviceName, token);
             var cert = EvaSystem.Singleton<ICertificateManager>().GenerateCertificate(nodeContract, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600, publicKey);
             
             HttpContext.Response.StatusCode = 200;
@@ -56,7 +56,7 @@ public class NodeAuthentificationController : WebApiController{
                 throw new Exception("Invalid token or expirated");
             }
 
-            var contract = NodeRegistry.Instance!.GetContractByName(cert!.Payload.Content.Subject);
+            var contract = EvaSystem.Singleton<INodeRegistry>().GetContractByName(cert!.Payload.Content.Subject);
             
             
             

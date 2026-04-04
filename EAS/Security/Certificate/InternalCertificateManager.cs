@@ -41,7 +41,7 @@ public class InternalCertificateManager : ICertificateManager{
                 entityType = EntityType.User;
                 break;
 
-            case NodeContract node:
+            case InternalNodeContract node:
                 subject = node.Name;
                 roles = node.Authorization.ToArray();
                 entityType = EntityType.Node;

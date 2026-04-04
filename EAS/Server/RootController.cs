@@ -3,6 +3,7 @@ using EmbedIO;
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
 using Eva.AuthorityServer.Nodes;
+using Eva.Commons.System;
 
 namespace Eva.AuthorityServer.Server;
 
@@ -28,7 +29,7 @@ public class RootController : WebApiController{
     public object GetNodes()
     {
         Dictionary<string, string> nodes = new Dictionary<string, string>();
-        foreach (var contract in NodeRegistry.Instance?.NodeContracts ?? new())
+        foreach (var contract in EvaSystem.Singleton<INodeRegistry>().NodeContracts ?? new())
         {
             nodes.Add(contract.Name, contract.Host + ":" + contract.Port);
         }
