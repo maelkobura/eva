@@ -17,7 +17,7 @@ using Microsoft.Extensions.Logging;
 using Mono.Options;
 
 string nodeConfigPath = "node.yml";
-string serviceConfigPath = "configuration/";
+string serviceConfigPath = AppContext.BaseDirectory + "configuration";
 string serviceBinaryPath = "node.dll";
 var configOverride = new Dictionary<string, string>();
 

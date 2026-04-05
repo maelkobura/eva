@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Xml.Linq;
 using Eva.Commons.Util;
 using Microsoft.Extensions.Logging;
 
@@ -19,26 +20,45 @@ public class Configuration<T> where T : new()
         if (hotReload)
             StartWatcher();
     }
-
     private void Load()
     {
         if (!File.Exists(_filePath))
         {
-            _logger.LogWarning("Service configuration file '{Path}' not found, using default values.", _filePath);
+            _logger.LogWarning("Config file '{Path}' not found, creating with default values.", _filePath);
             Value = new T();
+            Save();
             return;
         }
 
+        var previous = Value;
         try
         {
             var json = File.ReadAllText(_filePath);
-            Value = JsonSerializer.Deserialize<T>(json) ?? new T();
-            _logger.LogInformation("Service configuration file '{Path}' loaded successfully.", _filePath);
+            Value = JsonSerializer.Deserialize<T>(json) ?? previous;
+            _logger.LogInformation("Config file '{Path}' loaded successfully.", _filePath);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to read config file '{Path}'.", _filePath);
-            Value = new T();
+            _logger.LogError(ex, "Failed to read config file '{Path}', keeping previous value.", _filePath);
+            Value = previous; // restauration
+        }
+    }
+    
+    private void Save()
+    {
+        try
+        {
+            var dir = Path.GetDirectoryName(_filePath);
+            if (!string.IsNullOrEmpty(dir))
+                Directory.CreateDirectory(dir);
+        
+            var json = JsonSerializer.Serialize(Value, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(_filePath, json);
+            _logger.LogInformation("Service configuration file '{Path}' created with default values.", _filePath);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to create service configuration file '{Path}'.", _filePath);
         }
     }
 

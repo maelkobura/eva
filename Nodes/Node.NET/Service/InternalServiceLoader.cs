@@ -59,6 +59,7 @@ public class InternalServiceLoader : IServiceLoader
                 continue;
             }
 
+            Directory.CreateDirectory(baseConfigPath);
             var configType = field.FieldType.GetGenericArguments()[0];
             var filePath = Path.Combine(baseConfigPath, attr.Name);
             
