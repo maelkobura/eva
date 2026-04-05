@@ -17,12 +17,14 @@ using Microsoft.Extensions.Logging;
 using Mono.Options;
 
 string nodeConfigPath = "node.yml";
+string serviceConfigPath = "configuration/";
 string serviceBinaryPath = "node.dll";
 var configOverride = new Dictionary<string, string>();
 
 var options = new OptionSet {
     { "nc|nodeconfig=", "Node config path", n => nodeConfigPath = n },
     { "b|bin=", "Eva Service binary path", n => serviceBinaryPath = n },
+    { "c|cfg=", "Service Configuration directory", n => serviceConfigPath = n },
     { "p|prop=:", "Property key value", (key, value) =>
         {
             configOverride[key] = value;
@@ -69,7 +71,7 @@ EvaSystem.AddSingleton<IServiceRouter, InternalServiceRouter>();
 EvaSystem.AddSingleton<ITerminalManager, InternalTerminalManager>();
 
 EvaSystem.AddSingleton<IServiceLoader, InternalServiceLoader>(description);
-EvaSystem.Singleton<IServiceLoader>().LoadService();
+EvaSystem.Singleton<IServiceLoader>().LoadService(serviceConfigPath);
 
 Console.ReadKey(true);
 

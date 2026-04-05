@@ -16,5 +16,5 @@ public interface IServiceLoader : IDisposable
     /// Loads and returns the service.
     /// </summary>
     /// <returns>The loaded EvaService instance.</returns>
-    EvaService LoadService();
+    EvaService LoadService(string baseConfigPath);
 }
