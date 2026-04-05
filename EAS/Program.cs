@@ -49,7 +49,7 @@ class Program
         log.LogInformation("Current Runtime: {}", RuntimeInformation.FrameworkDescription);
         
         using var templateStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Eva.AuthorityServer.config.default.yml");
-        Configuration.Init(configPath, configOverride, templateStream);
+        SystemConfiguration.Init(configPath, configOverride, templateStream);
 
         EvaSystem.AddSingleton<IKeysManager,InternalKeysManager>();
         EvaSystem.AddSingleton<IUserAuthenticator,InternalUserAuthenticator>();

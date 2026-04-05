@@ -23,7 +23,7 @@ public class InternalAuthorityServerManager : IAuthorityServerManager {
         Swan.Logging.Logger.NoLogging();
 
         server = new WebServer(o => o
-                .WithUrlPrefix($"http://localhost:{Configuration.Content["server:port"]}/")
+                .WithUrlPrefix($"http://localhost:{SystemConfiguration.Content["server:port"]}/")
                 .WithMode(HttpListenerMode.EmbedIO))
             .WithModule(new AuthentificationMiddleware("/"))
             .WithWebApi("/node/manage", o => o.WithController<NodeManagerController>())

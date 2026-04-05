@@ -38,7 +38,7 @@ log.LogInformation("Initializing Eva Node (.NET)...");
 log.LogInformation("Current Runtime: {}", RuntimeInformation.FrameworkDescription);
 using var templateStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Eva.Node.node.default.yml");
 
-Configuration.Init(nodeConfigPath, configOverride, templateStream);
+SystemConfiguration.Init(nodeConfigPath, configOverride, templateStream);
 
 EvaSystem.AddSingleton<IAssemblyLoader, InternalAssemblyLoader>(serviceBinaryPath);
 var description = EvaSystem.Singleton<IAssemblyLoader>().LoadDescription();
@@ -49,10 +49,10 @@ log.LogInformation("Service License: {License}", description.License);
 log.LogInformation("Service Authorization Count: {Count} authorizations", description.Authorization?.Length ?? 0);
 
 EvaSystem.AddSingleton<IAuthorityClient, InternalAuthorityClient>(
-    Configuration.Content.GetSection("eas:main").Get<AuthorityConnectionInfo>(), 
-    Configuration.Content.GetSection("eas:backup").Get<AuthorityConnectionInfo>());
+    SystemConfiguration.Content.GetSection("eas:main").Get<AuthorityConnectionInfo>(), 
+    SystemConfiguration.Content.GetSection("eas:backup").Get<AuthorityConnectionInfo>());
 
-EvaSystem.AddSingleton<ICertificateManager, InternalCertificateManager>(Configuration.Content.GetSection("authentification:token").Get<string>());
+EvaSystem.AddSingleton<ICertificateManager, InternalCertificateManager>(SystemConfiguration.Content.GetSection("authentification:token").Get<string>());
 EvaSystem.Singleton<ICertificateManager>().GenerateEvaCertificate(description.Name);
 EvaSystem.Singleton<ICertificateManager>().GenerateTlsCertificate();
 

@@ -19,7 +19,7 @@ public class InternalNetworkManager : INetworkManager
     // === Conserver exactement le constructeur tel quel ===
     public InternalNetworkManager()
     {
-        bool enableTls = Configuration.Content["debug:skip-tls"] != "true";
+        bool enableTls = SystemConfiguration.Content["debug:skip-tls"] != "true";
 
         if (!enableTls)
         {
@@ -28,7 +28,7 @@ public class InternalNetworkManager : INetworkManager
 
         Swan.Logging.Logger.NoLogging();
         _server = new WebServer(o => o
-                .WithUrlPrefix($"http{(!enableTls ? "" : "s")}://localhost:{Configuration.Content["network:self:port"]}/")
+                .WithUrlPrefix($"http{(!enableTls ? "" : "s")}://localhost:{SystemConfiguration.Content["network:self:port"]}/")
                 .WithMode(HttpListenerMode.EmbedIO)
                 .WithCertificate(!enableTls ? null : EvaSystem.Singleton<ICertificateManager>().TlsNodeCertificate))
             .WithLocalSessionManager()

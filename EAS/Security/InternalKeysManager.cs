@@ -18,7 +18,7 @@ public class InternalKeysManager : IKeysManager{
         logger.LogInformation("Public key: {}", 
             PublicKeyBase64);
         logger.LogInformation("Private key: {}", 
-            Boolean.Parse(Configuration.Content["security:keys:showPrivateKey"] ?? "false") ? PrivateKeyBase64 : "hidden");
+            Boolean.Parse(SystemConfiguration.Content["security:keys:showPrivateKey"] ?? "false") ? PrivateKeyBase64 : "hidden");
     }
 
     private void GenerateKeys()

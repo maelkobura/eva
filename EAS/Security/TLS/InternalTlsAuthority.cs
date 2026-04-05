@@ -83,7 +83,7 @@ internal class InternalTlsAuthority : ITlsAuthority
         else
             san.AddDnsName(nodeId);
 
-        if (bool.Parse(Configuration.Content["debug.tls.allow-loopback"] ?? "false"))
+        if (bool.Parse(SystemConfiguration.Content["debug.tls.allow-loopback"] ?? "false"))
             san.AddDnsName("localhost");
 
         request.CertificateExtensions.Add(san.Build());

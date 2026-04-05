@@ -11,11 +11,11 @@ public class InternalUserAuthenticator : IUserAuthenticator {
     
     public InternalUserAuthenticator()
     {
-        string host = Configuration.Content["database:userAuthentification:host"] ?? "localhost";
-        string port = Configuration.Content["database:userAuthentification:port"] ?? "5432";
-        string database = Configuration.Content["database:userAuthentification:database"] ?? "evauser";
-        string user = Configuration.Content["database:userAuthentification:user"] ?? "eas";
-        string password = Configuration.Content["database:userAuthentification:password"] ?? "eas123";
+        string host = SystemConfiguration.Content["database:userAuthentification:host"] ?? "localhost";
+        string port = SystemConfiguration.Content["database:userAuthentification:port"] ?? "5432";
+        string database = SystemConfiguration.Content["database:userAuthentification:database"] ?? "evauser";
+        string user = SystemConfiguration.Content["database:userAuthentification:user"] ?? "eas";
+        string password = SystemConfiguration.Content["database:userAuthentification:password"] ?? "eas123";
         
         string dbConnection = $"Host={host};Port={port};Database={database};Username={user};Password={password}"; //TODO: Change for config
         

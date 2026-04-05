@@ -73,7 +73,7 @@ public class InternalCertificateManager : ICertificateManager
 
     public void GenerateTlsCertificate()
     {
-        if (Configuration.Content["debug:skip-tls"] == "true") return;
+        if (SystemConfiguration.Content["debug:skip-tls"] == "true") return;
 
         if (TlsNodeCertificate == null)
         {

@@ -22,7 +22,7 @@ public class AuthentificationMiddleware : WebModuleBase{
     {
         try
         {
-            if (Configuration.Content["debug:authentification:skip"] == "true")
+            if (SystemConfiguration.Content["debug:authentification:skip"] == "true")
             {
 
                 ctx.Items["certificate"] = null; //TODO Create a real debug cert

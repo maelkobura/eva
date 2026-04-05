@@ -5,10 +5,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Eva.AuthorityServer.System;
 
-public class Configuration
+public class SystemConfiguration
 {
 
-    private static ILogger logger = EvaLogger.CreateLogger<Configuration>();
+    private static ILogger logger = EvaLogger.CreateLogger<SystemConfiguration>();
     public static IConfigurationRoot Content { get; private set; }
 
     public static bool IsInitialized { get; private set; } = false;
