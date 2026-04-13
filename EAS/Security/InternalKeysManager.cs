@@ -1,5 +1,5 @@
-﻿using Eva.AuthorityServer.System;
-using Eva.Commons.Security;
+﻿using Eva.Commons.Security;
+using Eva.Commons.System;
 using Eva.Commons.Util;
 using Microsoft.Extensions.Logging;
 using NSec.Cryptography;
