@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <RootNamespace>AI_Service</RootNamespace>
+        <LangVersion>latestmajor</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Eva.Services.AI</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="authorization.txt" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Commons\Commons.csproj" />
+        <ProjectReference Include="..\..\Drivers\Eva.Drivers.Abstractions\Eva.Drivers.Abstractions.csproj" />
+        <ProjectReference Include="..\..\Drivers\Eva.Drivers.Core\Eva.Drivers.Core.csproj" />
+        <ProjectReference Include="..\..\Nodes\Node.NET\Node.NET.csproj"
+                          ReferenceOutputAssembly="true"
+                          Private="false"
+                          ExcludeAssets="runtime" />
+        <ProjectReference Include="..\EvaEngine\EvaEngine.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Google.Protobuf" Version="3.34.1" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
+    </PropertyGroup>
+
+</Project>

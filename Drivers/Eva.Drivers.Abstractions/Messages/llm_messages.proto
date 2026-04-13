@@ -1,0 +1,22 @@
+﻿syntax = "proto3";
+
+package eva.drivers.messages;
+
+option csharp_namespace = "Eva.Drivers.Abstractions.Messages";
+
+message LlmMessage {
+    string role = 1;
+    string content = 2;
+}
+
+message LlmOptions {
+    float temperature = 1;
+    int32 max_tokens = 2;
+}
+
+message LlmResponse {
+    string content = 1;
+    string model = 2;
+    int32 prompt_tokens = 3;
+    int32 completion_tokens = 4;
+}
