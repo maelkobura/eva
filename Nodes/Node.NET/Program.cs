@@ -1,6 +1,6 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Eva.AuthorityServer.System;
+using Eva.Node.Events.Bus;
 using Eva.Commons.System;
 using Eva.Commons.Util;
 using Eva.Node.Authority;
@@ -59,11 +59,15 @@ EvaSystem.Singleton<ICertificateManager>().GenerateEvaCertificate(description.Na
 EvaSystem.Singleton<ICertificateManager>().GenerateTlsCertificate();
 
 EvaSystem.AddSingleton<INodeDiscover, InternalNodeDiscover>(description);
-EvaSystem.AddSingleton<INetworkNodeManager, InternalNetworkNodeManager>();
+var networkNodeManager = EvaSystem.AddSingleton<INetworkNodeManager, InternalNetworkNodeManager>();
 
-EvaSystem.AddSingleton<INetworkManager, InternalNetworkManager>();
+var networkManager = EvaSystem.AddSingleton<INetworkManager, InternalNetworkManager>();
 EvaSystem.Singleton<INetworkManager>().Start();
 EvaSystem.Singleton<INodeDiscover>().Discover(true);
+
+var eventBus = EvaSystem.AddSingleton<IEventBus, InternalEventBus>();
+eventBus.SetNetworkDispatcher(networkManager);
+eventBus.SetNetworkSubscriber(networkNodeManager);
 
 EvaSystem.AddSingleton<IFunctionRegistry, InternalFunctionRegistry>();
 
@@ -72,6 +76,12 @@ EvaSystem.AddSingleton<ITerminalManager, InternalTerminalManager>();
 
 EvaSystem.AddSingleton<IServiceLoader, InternalServiceLoader>(description);
 EvaSystem.Singleton<IServiceLoader>().LoadService(serviceConfigPath);
+
+AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
+{
+    log.LogInformation("Shutting down " + description.DisplayName + "...");
+    EvaSystem.Clear();
+};
 
 Console.ReadKey(true);
 

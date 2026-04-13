@@ -36,7 +36,7 @@
             <OutputDir>obj\Debug\net9.0\</OutputDir>
             <Generator>MSBuild:Compile</Generator>
         </Protobuf>
-        <Protobuf Update="Messages\Certificate.proto" ProtoRoot="Messages">
+        <Protobuf Include="Events\*.proto" ProtoRoot="Events">
           <GrpcServices>Both</GrpcServices>
           <Access>Public</Access>
           <ProtoCompile>True</ProtoCompile>

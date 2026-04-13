@@ -1,0 +1,16 @@
+﻿syntax = "proto3";
+
+package eva.messages;
+
+option csharp_namespace = "Eva.Commons.Events";
+
+message NodeConnectedEvent {
+    string node_name = 1;
+    string node_address = 2;
+    bool first_connection = 3;
+}
+
+message NodeRefreshEvent {
+    string node_name = 1;
+    string node_address = 2;
+}

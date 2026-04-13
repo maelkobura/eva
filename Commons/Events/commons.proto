@@ -1,0 +1,25 @@
+﻿syntax = "proto3";
+
+package eva.events;
+
+option csharp_namespace = "Eva.Commons.Events";
+
+enum NetworkEventFrameType {
+  SIGNAL   = 0;
+  REQUEST  = 1;
+  RESPONSE = 2;
+}
+
+enum NetworkEventType {
+  SIG   = 0;
+  ASYNC  = 1;
+  SYNC = 2;
+}
+
+message NetworkEventFrame {
+  string                type_url       = 1;
+  bytes                 payload        = 2;
+  NetworkEventFrameType frame_type     = 3;
+  string                correlation_id = 4;
+  NetworkEventType event_type = 5;
+}
