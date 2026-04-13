@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>latestmajor</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Eva.Drivers.OpenAI</RootNamespace>
+        <AssemblyName>openai.driver</AssemblyName>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="OpenAI" Version="2.1.0" />
+        <PackageReference Include="System.ClientModel" Version="1.2.1" />
+        <PackageReference Include="Google.Protobuf" Version="3.34.1" />
+        <PackageReference Include="System.Memory.Data" Version="9.0.0" />
+
+        <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.37" PrivateAssets="All" />
+
+        <ProjectReference Include="..\Eva.Drivers.Abstractions\Eva.Drivers.Abstractions.csproj">
+            <Private>false</Private>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </ProjectReference>
+    </ItemGroup>
+
+    <Target Name="MergeOpenAIDriver" AfterTargets="Build">
+        <ItemGroup>
+            <InputAssemblies Include="$(OutputPath)openai.driver.dll" />
+            <InputAssemblies Include="$(OutputPath)OpenAI.dll" />
+            <InputAssemblies Include="$(OutputPath)System.ClientModel.dll" />
+            <InputAssemblies Include="$(OutputPath)System.Memory.Data.dll" />
+            <InputAssemblies Include="$(OutputPath)Google.Protobuf.dll" />
+            <InputAssemblies Include="$(OutputPath)System.Diagnostics.DiagnosticSource.dll" Condition="Exists('$(OutputPath)System.Diagnostics.DiagnosticSource.dll')" />
+        </ItemGroup>
+
+        <ILRepack
+                Parallel="true"
+                Internalize="false"
+                InputAssemblies="@(InputAssemblies)"
+                TargetKind="Dll"
+                OutputFile="$(OutputPath)openai.driver.dll"
+                LibraryPath="$(OutputPath)" />
+
+        <ItemGroup>
+            <FilesToDelete Include="$(OutputPath)OpenAI.dll" />
+            <FilesToDelete Include="$(OutputPath)System.ClientModel.dll" />
+            <FilesToDelete Include="$(OutputPath)System.Memory.Data.dll" />
+            <FilesToDelete Include="$(OutputPath)Google.Protobuf.dll" />
+            <FilesToDelete Include="$(OutputPath)System.Diagnostics.DiagnosticSource.dll" />
+        </ItemGroup>
+        <Delete Files="@(FilesToDelete)" />
+    </Target>
+
+</Project>
