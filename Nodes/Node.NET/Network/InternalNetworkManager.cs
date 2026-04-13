@@ -30,7 +30,7 @@ public class InternalNetworkManager : INetworkManager, INetworkEventDispatcher
             logger.LogWarning("TLS Server is disabled. Be careful to activate in production environment");
         }
 
-        //Swan.Logging.Logger.NoLogging();
+        Swan.Logging.Logger.NoLogging();
         
         _eventRoute = new NetworkEventRoute("/evnt");
         
