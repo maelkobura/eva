@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Eva.Node.Events.Bus;
+using Eva.Commons.Events;
 using Eva.Commons.Security.Certificate;
 using Eva.Commons.System;
 using Eva.Commons.Util;
@@ -61,6 +63,12 @@ public class InternalNodeDiscover : INodeDiscover
                 logger.LogInformation("Authenticated to node {0}", node.Name);
                 node.NodeTrustCertificate = Certificate.Parser.ParseFrom(Convert.FromBase64String(task.Result));
                 node.RefreshPanelAsync();
+                EvaSystem.Singleton<IEventBus>().EmitSignal<NodeConnectedEvent>("services.connected", new NodeConnectedEvent()
+                {
+                    NodeName = node.Name,
+                    NodeAddress = node.Address,
+                    FirstConnection = firstConnection
+                });
             }
         });
     }
