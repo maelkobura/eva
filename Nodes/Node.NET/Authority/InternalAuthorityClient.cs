@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Eva.AuthorityServer.System;
 
 namespace Eva.Node.Authority;
 

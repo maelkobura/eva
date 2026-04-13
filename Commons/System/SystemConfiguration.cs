@@ -1,9 +1,8 @@
-﻿using System.Reflection;
-using Eva.Commons.Util;
+﻿using Eva.Commons.Util;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Eva.AuthorityServer.System;
+namespace Eva.Commons.System;
 
 public class SystemConfiguration
 {

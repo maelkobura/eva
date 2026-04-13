@@ -2,7 +2,6 @@
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using Eva.AuthorityServer.System;
 using Eva.Commons.Security;
 using Eva.Commons.Security.Certificate;
 using Eva.Commons.System;
