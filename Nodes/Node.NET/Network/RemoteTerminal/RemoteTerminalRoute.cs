@@ -16,8 +16,6 @@ public class RemoteTerminalRoute : WebSocketModule {
     protected override Task OnMessageReceivedAsync(IWebSocketContext context, byte[] buffer,
         IWebSocketReceiveResult result)
     {
-        try
-        {
         var message = TerminalMessage.Parser.ParseFrom(buffer);
 
         TerminalSession session = (TerminalSession)context.Items["session"];
@@ -45,11 +43,6 @@ public class RemoteTerminalRoute : WebSocketModule {
                 return context.WebSocket.SendAsync(returnMessage.ToByteArray(), false);
 
         }
-    }    catch (Exception ex)
-    {
-        Console.WriteLine($"[Terminal] Erreur : {ex}");
-        throw;
-    }
         return Task.CompletedTask;
     
     }

@@ -67,7 +67,6 @@ public class NetworkEventClient : IAsyncDisposable
 
     private async Task ReceiveLoopAsync(ClientWebSocket ws, CancellationToken ct)
     {
-        Console.WriteLine("received");
         var buffer = new byte[64 * 1024];
 
         while (ws.State == WebSocketState.Open && !ct.IsCancellationRequested)
@@ -84,8 +83,6 @@ public class NetworkEventClient : IAsyncDisposable
             while (!result.EndOfMessage);
 
             var frame = NetworkEventFrame.Parser.ParseFrom(ms.ToArray());
-
-            Console.WriteLine("frame: " + frame);
             
             switch (frame.FrameType)
             {
@@ -128,7 +125,6 @@ public class NetworkEventClient : IAsyncDisposable
         try
         {
             var payload = DeserializePayload(frame);
-            Console.WriteLine("has payload: " + payload);
             
             if (payload is not null)
             {

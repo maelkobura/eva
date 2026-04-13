@@ -45,7 +45,6 @@ internal class AssemblyLoader : IDisposable {
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
                 logger.LogError(e, "Failed to load assembly {dllPath}", dllPath);
             }
         }

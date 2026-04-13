@@ -79,7 +79,6 @@ public class InternalEventBus : IEventBus
 
         foreach (var method in methods)
         {
-            Console.WriteLine("Subscribing " + method.Name + " to " + method.GetCustomAttribute<EventAttribute>()?.EventName);
             if (method.GetCustomAttribute<EventAttribute>() is null) continue;
 
             if (method.GetCustomAttribute<SignalEventAttribute>() is { } signalAttr)

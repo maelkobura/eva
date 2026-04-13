@@ -24,7 +24,6 @@ public class NetworkEventRoute : WebSocketModule
     protected override Task OnClientConnectedAsync(IWebSocketContext context)
     {
         var eventName = ParseEventName(context);
-        Console.WriteLine(eventName);
         if (string.IsNullOrEmpty(eventName))
         {
             logger.LogWarning("WebSocket connection rejected: no event name in URL");
@@ -97,7 +96,7 @@ public class NetworkEventRoute : WebSocketModule
     public async Task<IReadOnlyList<NetworkEventFrame>> RequestAsync(string eventName, NetworkEventFrame frame, NetworkEventType type)
     {
         var targets = GetTargets(eventName);
-        Console.WriteLine("nber of target: " + targets.Count);
+        
         if (targets.Count == 0) return [];
 
         var tasks = targets.Select(ctx => RequestOneAsync(ctx, eventName, frame, type));
