@@ -45,7 +45,14 @@ public class EvaSystem
         logger.LogWarning("Clearing singletons...");
         foreach (var singleton in _singletons.Values)
         {
-            singleton.Dispose();
+            try
+            {
+                singleton.Dispose();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Failed to dispose singleton {Singleton}", singleton.GetType().Name);
+            }
         }
         _singletons.Clear();
     }
