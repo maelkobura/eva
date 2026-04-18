@@ -4,7 +4,9 @@ using Eva.Drivers.Abstractions.Messages;
 using Eva.Drivers.Core;
 using Eva.Drivers.Core.Configuration;
 using Eva.Node.Configuration;
+using Eva.Node.Network;
 using Eva.Node.Service;
+using Eva.Node.Service.Functions;
 using Eva.Services.Engine;
 using Microsoft.Extensions.Logging;
 
@@ -28,6 +30,17 @@ public class AIService : EvaService {
         };
         _driverLoader.DriverPath = @"K:\Projets\Blume\Eva\Services\AI Service\bin\Debug\net9.0\drivers";
         _driverLoader.Load();
+    }
+    
+    [EvaFunction(Description = "Prompt Eva", Keywords = new[] { "ai", "runtime" })]
+    public LlmMessage Prompt(LlmMessage message)
+    {
+        Console.WriteLine(message.Content);
+        return new LlmMessage()
+        {
+            Content = "Hello",
+            Role = "world"
+        };
     }
 
     public void Shutdown()
