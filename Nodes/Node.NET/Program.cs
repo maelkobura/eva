@@ -12,6 +12,7 @@ using Eva.Node.Service;
 using Eva.Node.Service.Calling;
 using Eva.Node.Service.Functions;
 using Eva.Node.Terminal;
+using Eva.Node.Types;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Mono.Options;
@@ -42,6 +43,7 @@ using var templateStream = Assembly.GetExecutingAssembly().GetManifestResourceSt
 
 SystemConfiguration.Init(nodeConfigPath, configOverride, templateStream);
 
+EvaSystem.AddSingleton<ITypeRegistration, InternalTypeRegistration>();
 EvaSystem.AddSingleton<IAssemblyLoader, InternalAssemblyLoader>(serviceBinaryPath);
 var description = EvaSystem.Singleton<IAssemblyLoader>().LoadDescription();
 log.LogInformation("Service Information: {DisplayName} ({Name}) - Ver {Version}", description.DisplayName, description.Name, description.Version);

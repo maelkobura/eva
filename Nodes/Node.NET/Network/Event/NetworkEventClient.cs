@@ -1,7 +1,9 @@
 ﻿using System.Net.WebSockets;
 using Eva.Commons.Events;
+using Eva.Commons.System;
 using Eva.Commons.Util;
 using Eva.Node.Events.Bus;
+using Eva.Node.Types;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Microsoft.Extensions.Logging;
@@ -18,16 +20,14 @@ public class NetworkEventClient : IAsyncDisposable
     private readonly NodeEntity _node;
     private readonly string _eventName;
     private readonly IEventBus _eventBus;
-    private readonly TypeRegistry _typeRegistry;
     private readonly CancellationTokenSource _cts = new();
 
-    public NetworkEventClient(NodeEntity node, string nodeUrl, string eventName, IEventBus eventBus, TypeRegistry typeRegistry)
+    public NetworkEventClient(NodeEntity node, string nodeUrl, string eventName, IEventBus eventBus)
     {
         _nodeUrl      = nodeUrl;
         _node         = node;
         _eventName    = eventName;
         _eventBus     = eventBus;
-        _typeRegistry = typeRegistry;
     }
 
     public Task StartAsync() => Task.Run(() => RunAsync(_cts.Token));
@@ -171,7 +171,7 @@ public class NetworkEventClient : IAsyncDisposable
     {
         if (string.IsNullOrEmpty(frame.TypeUrl) || frame.Payload.IsEmpty) return null;
 
-        var descriptor = _typeRegistry.Find(frame.TypeUrl);
+        var descriptor = EvaSystem.Singleton<ITypeRegistration>().Registry.Find(frame.TypeUrl);
         if (descriptor is null)
         {
             logger.LogWarning("Unknown type '{TypeUrl}' for event '{Event}'", frame.TypeUrl, _eventName);

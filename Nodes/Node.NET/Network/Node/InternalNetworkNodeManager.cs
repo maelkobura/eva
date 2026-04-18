@@ -51,8 +51,7 @@ public class InternalNetworkNodeManager : INetworkNodeManager, INetworkEventSubs
                 node,
                 node.Address,
                 eventName,
-                EvaSystem.Singleton<IEventBus>(),
-                EvaSystem.Singleton<IEventBus>().TypeRegistry
+                EvaSystem.Singleton<IEventBus>()
             );
 
             _clients[eventName] = client;

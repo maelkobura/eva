@@ -70,28 +70,28 @@ public static (ReturnType type, byte[] value) ConvertFromJavascript(JsValue valu
     // Cas non-array (ta version précédente)
     return value.Type switch
     {
-        Types.String => (
+        Jint.Runtime.Types.String => (
             new ReturnType { Type = EvaType.String },
             Encoding.UTF8.GetBytes(value.AsString())
         ),
 
-        Types.Number => (
+        Jint.Runtime.Types.Number => (
             new ReturnType { Type = EvaType.Double },
             BitConverter.GetBytes(value.AsNumber())
         ),
 
-        Types.Boolean => (
+        Jint.Runtime.Types.Boolean => (
             new ReturnType { Type = EvaType.Boolean },
             BitConverter.GetBytes(value.AsBoolean())
         ),
         
 
-        Types.Null => (
+        Jint.Runtime.Types.Null => (
             new ReturnType { Type = EvaType.String },
             Array.Empty<byte>()
         ),
 
-        Types.Undefined => (
+        Jint.Runtime.Types.Undefined => (
             new ReturnType { Type = EvaType.String },
             Array.Empty<byte>()
         ),

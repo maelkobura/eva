@@ -2,7 +2,6 @@ using System.Reflection;
 using Eva.Commons.Util;
 using Eva.Commons.Messages;
 using Eva.Commons.System;
-using Google.Protobuf.Collections;
 using Microsoft.Extensions.Logging;
 
 namespace Eva.Node.Service.Functions;

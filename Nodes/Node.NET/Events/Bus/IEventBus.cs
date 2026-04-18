@@ -7,9 +7,6 @@ namespace Eva.Node.Events.Bus;
 
 public interface IEventBus : IDisposable
 {
-    public TypeRegistry TypeRegistry { get; }
-    
-    
     public Task RegisterListener(Listener listener);
     public void UnregisterListener(Listener listener);
     void EmitSignal(string eventName, bool networked = true);

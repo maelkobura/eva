@@ -1,6 +1,9 @@
 ﻿using System.Reflection;
 using Eva.Commons.Events;
+using Eva.Commons.System;
+using Eva.Commons.Util;
 using Eva.Node.Events.Dispatcher;
+using Eva.Node.Types;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 
@@ -13,16 +16,11 @@ internal record AsyncHandler(object Instance, MethodInfo Method, Type ParamType)
 public class InternalEventBus : IEventBus
 {
     
-    public TypeRegistry TypeRegistry { get; private set; }
 
     private readonly Dictionary<string, List<SignalHandler>> _signals    = new();
     private readonly Dictionary<string, List<SyncHandler>>  _syncEvents  = new();
     private readonly Dictionary<string, List<AsyncHandler>> _asyncEvents = new();
-
-    public InternalEventBus()
-    {
-        TypeRegistry = BuildTypeRegistry();
-    }
+    
     
     private INetworkEventDispatcher? _networkDispatcher;
     private INetworkEventSubscriber? _networkSubscriber;
@@ -40,37 +38,6 @@ public class InternalEventBus : IEventBus
             Payload  = payload.ToByteString(),
             FrameType = type
         };
-    
-    private TypeRegistry BuildTypeRegistry()
-    {
-        var descriptors = AppDomain.CurrentDomain
-            .GetAssemblies()
-            .SelectMany(a =>
-            {
-                try { return a.GetTypes(); }
-                catch { return []; }
-            })
-            .Where(t =>
-                !t.IsAbstract &&
-                !t.IsInterface &&
-                typeof(IMessage).IsAssignableFrom(t))
-            .Select(t =>
-            {
-                try
-                {
-                    var descriptor = t.GetProperty(
-                        "Descriptor",
-                        BindingFlags.Public | BindingFlags.Static
-                    );
-                    return descriptor?.GetValue(null) as MessageDescriptor;
-                }
-                catch { return null; }
-            })
-            .Where(d => d is not null)
-            .Cast<MessageDescriptor>();
-
-        return TypeRegistry.FromMessages(descriptors);
-    }
 
     public async Task RegisterListener(Listener listener)
     {
@@ -194,7 +161,7 @@ public class InternalEventBus : IEventBus
             if (_networkDispatcher is null)
                 throw new InvalidOperationException("Network dispatcher not set.");
             var frame = BuildFrame(eventName, payload, NetworkEventFrameType.Signal);
-            _networkDispatcher.DispatchSignal(eventName, frame, TypeRegistry);
+            _networkDispatcher.DispatchSignal(eventName, frame, EvaSystem.Singleton<ITypeRegistration>().Registry);
             return;
         }
 
@@ -225,7 +192,7 @@ public class InternalEventBus : IEventBus
             if (_networkDispatcher is null)
                 throw new InvalidOperationException("Network dispatcher not set.");
             var frame = BuildFrame(eventName, payload, NetworkEventFrameType.Request);
-            return (T?) await _networkDispatcher.DispatchSyncAsync(eventName, frame, TypeRegistry);
+            return (T?) await _networkDispatcher.DispatchSyncAsync(eventName, frame, EvaSystem.Singleton<ITypeRegistration>().Registry);
         }
 
         if (!_syncEvents.TryGetValue(eventName, out var handlers)) return payload;
@@ -256,7 +223,7 @@ public class InternalEventBus : IEventBus
             if (_networkDispatcher is null)
                 throw new InvalidOperationException("Network dispatcher not set.");
             var frame = BuildFrame(eventName, payload, NetworkEventFrameType.Request);
-            var resultss = await _networkDispatcher.DispatchAsync(eventName, frame, TypeRegistry);
+            var resultss = await _networkDispatcher.DispatchAsync(eventName, frame, EvaSystem.Singleton<ITypeRegistration>().Registry);
             return resultss.Cast<T>().ToList();
         }
  
@@ -361,7 +328,7 @@ public class InternalEventBus : IEventBus
     private IMessage? DeserializeFrame(NetworkEventFrame frame)
     {
         if (string.IsNullOrEmpty(frame.TypeUrl) || frame.Payload.IsEmpty) return null;
-        var descriptor = TypeRegistry.Find(frame.TypeUrl);
+        var descriptor = EvaSystem.Singleton<ITypeRegistration>().Registry.Find(frame.TypeUrl);
         return descriptor?.Parser.ParseFrom(frame.Payload);
     }
 
