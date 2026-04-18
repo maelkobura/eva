@@ -2,8 +2,12 @@
 using Eva.Commons.Messages;
 using Eva.Commons.Security;
 using Eva.Commons.Security.Certificate;
+using Eva.Commons.System;
 using Eva.Commons.Util;
+using Eva.Node.Types;
 using Google.Protobuf;
+using Google.Protobuf.Reflection;
+using Google.Protobuf.WellKnownTypes;
 using Type = System.Type;
 
 namespace Eva.Node.Service.Functions;
@@ -43,14 +47,14 @@ public class FunctionExecutor
                     continue;
                 }
 
-                args[i] = DeserializeParameter(bytes.ToByteArray(), FunctionsUtil.MapPrimitive(param.Type));
+                args[i] = DeserializeParameter(bytes.ToByteArray(), param.Type, FunctionsUtil.MapPrimitive(param.Type));
             }
 
             // 3. Invoke the function
             var result = await _descriptor.Invoke(args);
 
             // 4. Serialize result to bytes
-            var serialized = SerializeResult(result, _descriptor.ReturnType);
+            var serialized = SerializeResult(result, _descriptor.ReturnType, request.InJson);
             return new InvokeResponse { Success = true, Result = serialized };
         }
         catch (Exception ex)
@@ -59,34 +63,64 @@ public class FunctionExecutor
         }
     }
 
-    private static object? DeserializeParameter(byte[] bytes, EvaType type) => type switch
+    private object? DeserializeParameter(byte[] bytes, Type paramType, EvaType evaType)
     {
-        EvaType.String    => Encoding.UTF8.GetString(bytes),
-        EvaType.Int32     => BitConverter.ToInt32(bytes),
-        EvaType.Int64     => BitConverter.ToInt64(bytes),
-        EvaType.Boolean   => BitConverter.ToBoolean(bytes),
-        EvaType.Float     => BitConverter.ToSingle(bytes),
-        EvaType.Double    => BitConverter.ToDouble(bytes),
-        EvaType.Timestamp => DateTime.FromBinary(BitConverter.ToInt64(bytes)),
-        EvaType.Bytes     => bytes,
-        _                 => bytes //TODO EvaObject
-    };
+        if (evaType != EvaType.Object)
+        {
+            return evaType switch
+            {
+                EvaType.String    => Encoding.UTF8.GetString(bytes),
+                EvaType.Int32     => BitConverter.ToInt32(bytes),
+                EvaType.Int64     => BitConverter.ToInt64(bytes),
+                EvaType.Boolean   => BitConverter.ToBoolean(bytes),
+                EvaType.Float     => BitConverter.ToSingle(bytes),
+                EvaType.Double    => BitConverter.ToDouble(bytes),
+                EvaType.Timestamp => DateTime.FromBinary(BitConverter.ToInt64(bytes)),
+                EvaType.Bytes     => bytes,
+                _                 => bytes
+            };
+        }
 
-    private static ByteString SerializeResult(object? result, Type type)
+        // EvaObject path
+        if (!typeof(IMessage).IsAssignableFrom(paramType))
+            return bytes; // type inconnu, on retourne les bytes bruts
+
+        var package = EvaObjectPackage.Parser.ParseFrom(bytes);
+        var descriptor = EvaSystem.Singleton<ITypeRegistration>().Registry.Find(package.TypeUrl);
+        if (descriptor is null)
+            throw new InvalidOperationException($"Type non trouvé dans le TypeRegistry: '{package.TypeUrl}'");
+
+        var parser = descriptor.Parser;
+        return parser.ParseFrom(package.Payload);
+    }
+
+    private static ByteString SerializeResult(object? result, Type type, bool inJson)
     {
         if (result is null) return ByteString.Empty;
 
+        if (result is IMessage message)
+        {
+            var package = new EvaObjectPackage
+            {
+                TypeUrl = message.Descriptor.FullName,
+                Payload = inJson
+                    ? ByteString.CopyFromUtf8(JsonFormatter.Default.Format(message))
+                    : message.ToByteString()
+            };
+            return package.ToByteString();
+        }
+
         var bytes = result switch
         {
-            string s   => Encoding.UTF8.GetBytes(s),
-            int i      => BitConverter.GetBytes(i),
-            long l     => BitConverter.GetBytes(l),
-            bool b     => BitConverter.GetBytes(b),
-            float f    => BitConverter.GetBytes(f),
-            double d   => BitConverter.GetBytes(d),
+            string s    => Encoding.UTF8.GetBytes(s),
+            int i       => BitConverter.GetBytes(i),
+            long l      => BitConverter.GetBytes(l),
+            bool b      => BitConverter.GetBytes(b),
+            float f     => BitConverter.GetBytes(f),
+            double d    => BitConverter.GetBytes(d),
             DateTime dt => BitConverter.GetBytes(dt.ToBinary()),
-            byte[] raw => raw,
-            _          => [] //TODO EvaObject
+            byte[] raw  => raw,
+            _           => []
         };
 
         return ByteString.CopyFrom(bytes);

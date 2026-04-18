@@ -2,9 +2,12 @@
 using Eva.Commons.Messages;
 using Eva.Commons.Security.Certificate;
 using Eva.Commons.System;
+using Eva.Commons.Util;
 using Eva.Node.Network;
 using Eva.Node.Service.Functions;
+using Eva.Node.Types;
 using Google.Protobuf;
+using Google.Protobuf.Reflection;
 
 namespace Eva.Node.Service.Calling;
 
@@ -83,25 +86,46 @@ public class InternalServiceRouter : IServiceRouter {
     
     public void Dispose() {}
     
-    private T DeserializeResult<T>(byte[] bytes)
+private T DeserializeResult<T>(byte[] bytes)
+{
+    if (typeof(IMessage).IsAssignableFrom(typeof(T)))
     {
-        object result = typeof(T) switch
-        {
-            _ when typeof(T) == typeof(string)   => Encoding.UTF8.GetString(bytes),
-            _ when typeof(T) == typeof(int)      => BitConverter.ToInt32(bytes),
-            _ when typeof(T) == typeof(long)     => BitConverter.ToInt64(bytes),
-            _ when typeof(T) == typeof(bool)     => BitConverter.ToBoolean(bytes),
-            _ when typeof(T) == typeof(float)    => BitConverter.ToSingle(bytes),
-            _ when typeof(T) == typeof(double)   => BitConverter.ToDouble(bytes),
-            _ when typeof(T) == typeof(DateTime) => DateTime.FromBinary(BitConverter.ToInt64(bytes)),
-            _ when typeof(T) == typeof(byte[])   => bytes,
-            _ => throw new ArgumentException($"Unsupported return type: {typeof(T).Name}")
-        };
-
-        return (T)result;
+        var package = EvaObjectPackage.Parser.ParseFrom(bytes);
+        var descriptor = EvaSystem.Singleton<ITypeRegistration>().Registry.Find(package.TypeUrl);
+        if (descriptor is null)
+            throw new InvalidOperationException($"Type non trouvé dans le TypeRegistry: '{package.TypeUrl}'");
+        return (T)descriptor.Parser.ParseFrom(package.Payload);
     }
 
-    private byte[] SerializeParameter(object value) => value switch
+    object result = typeof(T) switch
+    {
+        _ when typeof(T) == typeof(string)   => Encoding.UTF8.GetString(bytes),
+        _ when typeof(T) == typeof(int)      => BitConverter.ToInt32(bytes),
+        _ when typeof(T) == typeof(long)     => BitConverter.ToInt64(bytes),
+        _ when typeof(T) == typeof(bool)     => BitConverter.ToBoolean(bytes),
+        _ when typeof(T) == typeof(float)    => BitConverter.ToSingle(bytes),
+        _ when typeof(T) == typeof(double)   => BitConverter.ToDouble(bytes),
+        _ when typeof(T) == typeof(DateTime) => DateTime.FromBinary(BitConverter.ToInt64(bytes)),
+        _ when typeof(T) == typeof(byte[])   => bytes,
+        _ => throw new ArgumentException($"Unsupported return type: {typeof(T).Name}")
+    };
+
+    return (T)result;
+}
+
+private byte[] SerializeParameter(object value)
+{
+    if (value is IMessage message)
+    {
+        var package = new EvaObjectPackage
+        {
+            TypeUrl = message.Descriptor.FullName,
+            Payload = message.ToByteString()
+        };
+        return package.ToByteArray();
+    }
+
+    return value switch
     {
         string s    => Encoding.UTF8.GetBytes(s),
         int i       => BitConverter.GetBytes(i),
@@ -113,4 +137,5 @@ public class InternalServiceRouter : IServiceRouter {
         byte[] raw  => raw,
         _           => throw new ArgumentException($"Unsupported parameter type: {value.GetType().Name}")
     };
+}
 }

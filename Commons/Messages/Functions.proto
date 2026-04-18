@@ -52,6 +52,7 @@ message FunctionPanel {
 message InvokeRequest {
   string caller_id = 1;
   map<string, bytes> parameters = 2;
+  bool in_json = 3;
 }
 
 message InvokeResponse {

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package eva.messages;
+
+option csharp_namespace = "Eva.Commons.Messages";
+
+import "Functions.proto";
+
+message EvaObjectPackage {
+  string type_url = 1;
+  bytes payload = 2;
+  repeated EvaFunctionDescriptor functions = 3;
+}
