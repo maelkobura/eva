@@ -1,5 +1,6 @@
 ﻿import asyncio
 import base64
+import json
 
 import requests
 
@@ -51,6 +52,7 @@ func_name = input("\nEnter function name to invoke: ")
 # Build InvokeRequest
 invoke_request = Functions_pb2.InvokeRequest()
 invoke_request.caller_id = username
+invoke_request.in_json = True
 
 # Fill parameters interactively
 target_func = next((f for f in panel.functions if f.name == func_name), None)
@@ -82,6 +84,18 @@ invoke_result = Functions_pb2.InvokeResponse()
 invoke_result.ParseFromString(invoke_response.content)
 
 if invoke_result.success:
-    print(f"\nResult: {invoke_result.result.decode('utf-8')}") # TODO Handle other types
+    if invoke_result.result:
+        try:
+            package = Functions_pb2.EvaObjectPackage()
+            package.ParseFromString(invoke_result.result)
+            payload = package.payload.decode('utf-8')
+            parsed = json.loads(payload)
+            print(f"\nResult ({package.type_url}):")
+            print(json.dumps(parsed, indent=2))
+        except Exception:
+            # Fallback pour les primitives
+            print(f"\nResult: {invoke_result.result.decode('utf-8')}")
+    else:
+        print("\nResult: (empty)")
 else:
     print(f"\nError: {invoke_result.error}")
